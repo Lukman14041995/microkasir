@@ -60,4 +60,18 @@ if(!empty($_SESSION['admin'])){
 		echo '<script>window.location="../../index.php?page=laporan&remove=hapus"</script>';
 	}
 }
+elseif (!empty($_SESSION['kasir'])) {
+	require "../../config.php";
+	if(!empty($_GET['penjualan'])){
+		
+		$sqlI = 'INSERT INTO nota SELECT * FROM penjualan';
+		$rowI = $config -> prepare($sqlI);
+		$rowI -> execute($dataI);
+		
+		$sql = 'DELETE FROM penjualan';
+		$row = $config -> prepare($sql);
+		$row -> execute();
+		echo '<script>window.location="../../index.php?page=jual"</script>';
+	}
+}
 

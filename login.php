@@ -7,19 +7,32 @@
 		$user = strip_tags($_POST['user']);
 		$pass = strip_tags($_POST['pass']);
 
-		$sql = 'select member.*, login.user, login.pass
+		$sql = 'select member.*, login.user, login.pass, login.role
 				from member inner join login on member.id_member = login.id_member
 				where user =? and pass = md5(?)';
+
 		$row = $config->prepare($sql);
 		$row -> execute(array($user,$pass));
-		$jum = $row -> rowCount();
-		if($jum > 0){
-			$hasil = $row -> fetch();
-			$_SESSION['admin'] = $hasil;
-			echo '<script>alert("Login Sukses");window.location="index.php"</script>';
-		}else{
-			echo '<script>alert("Login Gagal");history.go(-1);</script>';
+		if ($row-> rowCount()>0) {
+			$data = $row->fetch();
+			if ($data['role'] == "admin") {
+				$_SESSION['admin'] = $data;
+				echo "<script>alert('Login Sukses');
+							  window.location.href='index.php';
+	 				  </script>";
+			}elseif ($data['role'] == "kasir") {
+				$_SESSION['kasir'] = $data; 
+				echo "<script>alert('Login Sukses');
+					          window.location.href='index.php';
+	                  </script>";
+			}elseif ($data['role'] == "superuser") {
+				$_SESSION['superuser'] = $data;
+				echo "<script>alert('Login Sukses');
+							  window.location.href='index.php';		
+				      </script>";
+			}
 		}
+
 	}
 ?>
 <!DOCTYPE html>
@@ -31,13 +44,13 @@
     <meta name="author" content="Dashboard">
     <meta name="keyword">
 
-    <title>Login To Admin</title>
+    <title>Login</title>
 
     <!-- Bootstrap core CSS -->
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <!--external css-->
     <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
-        
+    <link rel="icon" href="assets/img/logo.png" type="image/gif">
     <!-- Custom styles for this template -->
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/style-responsive.css" rel="stylesheet">

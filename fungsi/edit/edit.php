@@ -216,7 +216,140 @@ if(!empty($_SESSION['admin'])){
 			</tr>
 		<?php }?>
 		</table>
-<?php	
+		<?php  
+		}
+	}
+	
+}elseif (!empty($_SESSION['kasir'])) {
+	require '../../config.php';
+
+	if (!empty($_GET['gambar'])) {
+		$id = htmlentities($_POST['id']);
+		set_time_limit(0);
+		$allowedImageType = array("image/gif",   "image/JPG",   "image/jpeg",   "image/pjpeg",   "image/png",   "image/x-png"  );
+
+		if ($_FILES['foto']["error"] > 0) {
+			$output['error']= "Error in File";
+		} elseif (!in_array($_FILES['foto']["type"], $allowedImageType)) {
+			echo "You can only upload JPG, PNG and GIF file";
+			echo "<font face='Verdana' size='2' ><BR><BR><BR>
+					<a href='../../index.php?page=user'>Back to upform</a><BR>";
+
+		}elseif (round($_FILES['foto']["size"] / 1024) > 4096) {
+			echo "WARNING !!! Besar Gambar Tidak Boleh Lebih Dari 4 MB";
+			echo "<font face='Verdana' size='2' ><BR><BR><BR>
+					<a href='../../index.php?page=user'>Back to upform</a><BR>";
+		}else {
+			$target_path = '../../assets/img/user/';
+			$target_path = $target_path . basename($_FILES['foto']['name']);
+			if (file_exists("$target_path")) {
+				echo "<font face = 'Verdana' size = '2'>Ini Terjadi Karena Telah Masuk Nama File Yang Sama,<br> Silahkan Rename File terlebih dahulu<br>";
+
+				echo "<font face='Verdana' size='2' ><BR><BR><BR>
+						<a href='../../index.php?page=user'>Back to upform</a><BR>";
+			}elseif (move_uploaded_file($_FILES['foto']['tmp_name'], $target_path)) {
+				$foto2 = $_POST['foto2'];
+				unlink('../../assets/img/user/'.$foto2.'');
+				$id = $_POST['id'];
+				$data[] = $_FILES['foto']['name'];
+				$data[] = $id;
+				$sql = 'UPDATE member SET gambar =? WHERE member.id_member =? ';
+				$row = $config -> prepare($sql);
+				$row -> execute($data);
+				echo "<script>window.location='../../index.php?page=user&success=edit-data'</script>";
+			}
+		}
+	}
+	if (!empty($_GET['profil'])) {
+		$id = htmlentities($_POST['id']);
+		$nama = htmlentities($_POST['nama']);
+		$alamat = htmlentities($_POST['alamat']);
+		$tlp = htmlentities($_POST['tlp']);
+		$email = htmlentities($_POST['email']);
+		$nik = htmlentities($_POST['nik']);
+
+
+		$data[] = $nama;
+		$data[] = $alamat;
+		$data[] = $tlp;
+		$data[] = $email;
+		$data[] = $nik;
+		$data[] = $id;
+		$sql = 'UPDATE member SET nm_member =?,alamat_member=?,telepon=?,email=?,NIK=? WHERE id_member=?';
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo "<script>window.location='../../index.php?page=user&success=edit-data'</script>";
+	}
+	if (!empty($_GET['pass'])) {
+		$id = htmlentities($_POST['id']);
+		$user = htmlentities($_POST['user']);
+		$pass = htmlentities($_POST['pass']);
+
+		$data[] = $user;
+		$data[] = $pass;
+		$data[] = $id;
+		$sql = 'UPDATE login SET user=?, pass=md5(?) WHERE id_member=?';
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo "<script>window.location='../../index.php?page=user&success=edit-data'</script>";
+	}
+	if (!empty($_GET['cari_barang'])) {
+		$cari = trim(strip_tags($_POST['keyword']));
+		if ($cari = '') {
+			# code...
+		}else {
+			$sql = "SELECT barang.*, kategori.id_kategori, kategori.nama_kategori FROM barang INNER JOIN kategori ON barang.id_kategori = kategori.id_kategori WHERE barang.id_barang like '%$cari%' or barang.nama_barang like '%$cari%' or barang.merk like '%$cari%'";
+			$row = $config -> prepare($sql);
+			$row -> execute();
+			$hasil1 = $row -> fetchAll();
+		}
+		?>
+		<table class="table table-stripped" width="100%" id="example2">
+			<tr>
+				<th>ID Barang</th>
+				<th>Nama Barang</th>
+				<th>Merk</th>
+				<th>Harga Jual</th>
+				<th>Aksi</th>
+			</tr>
+			<?php foreach ($hasil1 as $hasil) {
+			 ?>
+			<tr>
+				<td><?= $hasil['id_barang']; ?></td>
+				<td><?= $hasil['nama_barang']; ?></td>
+				<td><?= $hasil['merk']; ?></td>
+				<td><?= $hasil['harga_jual']; ?></td>
+				<td><a href="fungsi/tambah/tambah.php?jual=jual&id=<?php echo $hasil['id_barang'];?>&id_kasir=<?php echo $_SESSION['kasir']['id_member'];?>" 
+					class="btn btn-success">
+					<i class="fa fa-shopping-cart"></i></a></td>
+			</tr>
+			<?php } ?>
+		</table>
+		<?php
+	}
+	if(!empty($_GET['jual'])){
+		$id = htmlentities($_POST['id']);
+		$id_barang = htmlentities($_POST['id_barang']);
+		$jumlah = htmlentities($_POST['jumlah']);
+
+		$sql_tampil = "SELECT * FROM barang where barang.id_barang = ?";
+		$row_tampil = $config -> prepare($sql_tampil);
+		$row_tampil -> execute(array($id_barang));
+		$hasil = $row_tampil -> fetch();
+
+		if ($hasil['stok'] > $jumlah) {
+			$jual = $hasil['harga_jual'];
+			$total = $jual * $jumlah;
+			$data1[] = $jumlah;
+			$data1[] = $total;
+			$data1[] = $id;
+			$sql1 = "UPDATE penjualan SET jumlah=?, total=? WHERE id_penjualan=?";
+			$row1 = $config -> prepare($sql1);
+			$row1 -> execute($data1);
+			echo "<script>window.location='../../index.php?page=jual#keranjang'</script>";
+		}else {
+			echo "<script>alert('Keranjang Melebihi Stok Barang Anda!');
+			window.location='../../index.php?page=jual#keranjang'</script>";
 		}
 	}
 }

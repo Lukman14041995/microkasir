@@ -7,7 +7,7 @@
 		function __construct($db){
 			$this->db = $db;
 		}
-			
+
 			function member(){
 				$sql = "select member.*, login.*
 						from member inner join login on member.id_member = login.id_member";
@@ -89,6 +89,64 @@
 					 $format = 'BR'.$tambah.'';
 				}
 				return $format;
+			}		
+
+			function jual_id(){
+				$sql = 'SELECT * FROM penjualan ORDER BY id_jual DESC';
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetch();
+				
+				$urut = substr($hasil['id_jual'], 2, 3);
+				$tambah = (int) $urut + 1;
+				if(strlen($tambah) == 1){
+					 $format = 'BR00'.$tambah.'';
+				}else if(strlen($tambah) == 2){
+					 $format = 'BR0'.$tambah.'';
+				}else{
+					 $format = 'BR'.$tambah.'';
+				}
+				return $format;
+			}
+
+			function pengeluaran_id(){
+				$konek = mysqli_connect("localhost","root","","db_toko");
+				$num = "";
+				$perfik = "PEN";
+				$query = "SELECT MAX(no_pengeluaran) as kode FROM pengeluaran";
+				$run = mysqli_query($konek, $query);
+				$data = mysqli_fetch_array($run);
+				$row = mysqli_num_rows($run);
+				$num = $data["kode"];
+				$number = (int)substr($num, 4,5);
+				$number++;
+
+				if ($row > 0) {
+					$value = $perfik.sprintf("%05s", $number);
+				}else{
+				}
+				return $value;	
+			}
+
+			function invoice_id(){
+				$konek = mysqli_connect("localhost","root","","db_toko");
+				$num = "";
+				$perfik = "RTQ";
+				// $date = date("Ymd");
+				$query = "SELECT MAX(invoice) as kode FROM nota";
+				$run = mysqli_query($konek, $query);
+				$data = mysqli_fetch_array($run);
+				$row = mysqli_num_rows($run);
+				$num = $data["kode"];
+				$number = (int)substr($num, 4,5);
+				$number++;
+
+				if ($row > 0) {
+					$value = $perfik.sprintf("%05s", $number);
+				}else{
+				}
+				return $value;
+				
 			}
 
 			function kategori_edit($id){
@@ -139,33 +197,42 @@
 				return $hasil;
 			}
 
+			function total_row(){
+				$sql ="SELECT SUM total FROM nota";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetch();
+				return $hasil;
+			}
+
 			function jual(){
-				$sql ="SELECT nota.* , barang.id_barang, barang.nama_barang, member.id_member,
-						member.nm_member from nota 
-					   left join barang on barang.id_barang=nota.id_barang 
-					   left join member on member.id_member=nota.id_member 
-					   ORDER BY id_nota DESC";
+				$sql = "SELECT nota.*, barang.id_barang, barang.nama_barang, member.nm_member, transaksi.totalsemua, 
+						transaksi.bayar, transaksi.kembali, transaksi.diskon from nota
+						inner join barang on nota.id_barang = barang.id_barang
+						inner join member on nota.id_member = member.id_member
+						inner join transaksi on nota.invoice = transaksi.invoice
+						ORDER BY id_nota DESC";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
 				return $hasil;
 			}
-
 			
-			function periode_jual($periode){
+			function periode_jual($tanggal1 , $tanggal2){
 				$sql ="SELECT nota.* , barang.id_barang, barang.nama_barang, member.id_member,
-						member.nm_member from nota 
-					   left join barang on barang.id_barang=nota.id_barang 
-					   left join member on member.id_member=nota.id_member WHERE nota.periode = ?";
+						member.nm_member, transaksi.totalsemua, transaksi.bayar, transaksi.kembali, transaksi.diskon from nota 
+					   inner join barang on barang.id_barang=nota.id_barang 
+					   inner join member on member.id_member=nota.id_member 
+					   inner join transaksi on nota.invoice = transaksi.invoice 
+					   WHERE nota.periode between '$tanggal1' and '$tanggal2'";
 				$row = $this-> db -> prepare($sql);
-				$row -> execute(array($periode));
+				$row -> execute(array($tanggal1 , $tanggal2));
 				$hasil = $row -> fetchAll();
 				return $hasil;
 			}
 
-
 			function penjualan(){
-				$sql ="SELECT penjualan.* , barang.id_barang, barang.nama_barang, member.id_member,
+				$sql ="SELECT penjualan.* , barang.id_barang, barang.nama_barang, barang.id_barang, barang.harga_jual, member.id_member,
 						member.nm_member from penjualan 
 					   left join barang on barang.id_barang=penjualan.id_barang 
 					   left join member on member.id_member=penjualan.id_member
@@ -197,6 +264,42 @@
 				$row = $this -> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetch();
+				return $hasil;
+			}
+
+			function pengeluaran(){
+				$sql = "select pengeluaran.*, kategori.id_kategori, kategori.nama_kategori
+						from pengeluaran inner join kategori on pengeluaran.id_kategori = kategori.id_kategori
+						";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+			function pengeluaran_tgl($tanggal1 , $tanggal2){
+				$sql = "select pengeluaran.*, kategori.id_kategori, kategori.nama_kategori
+						from pengeluaran inner join kategori on pengeluaran.id_kategori = kategori.id_kategori where pengeluaran.periode BETWEEN '$tanggal1' and '$tanggal2' ";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute(array($tanggal1, $tanggal2));
+				$hasil = $row -> fetchAll();
+				return $hasil;
+				echo '<script>window.location="../../index.php?page=pengeluaran"</script>';
+			}
+
+			function jml_pengeluaran(){
+				$sql ="SELECT SUM(nominal) as pay FROM pengeluaran";
+				$row = $this -> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetch();
+				return $hasil;
+				
+			}
+
+			function user(){
+				$sql = "SELECT * FROM member";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
 				return $hasil;
 			}
 	 }

@@ -58,10 +58,11 @@
 										<th>Kategori</th>
 										<th>Nama Barang</th>
 										<th>Merk</th>
-										<th>Harga Beli</th>
+										<th>HPP</th>
 										<th>Harga Jual</th>
 										<th>Stok</th>
 										<th>Satuan</th>
+										<!-- <th>Expired</th> -->
 										<th>Aksi</th>
 									</tr>
 								</thead>
@@ -171,7 +172,7 @@
 												<td><input type="text" placeholder="Merk Barang" required class="form-control"  name="merk"></td>
 											</tr>
 											<tr>
-												<td>Harga Beli</td>
+												<td>HPP</td>
 												<td><input type="number" placeholder="Harga beli" required class="form-control" name="beli"></td>
 											</tr>
 											<tr>
@@ -194,6 +195,10 @@
 											<tr>
 												<td>Tanggal Input</td>
 												<td><input type="text" required readonly="readonly" class="form-control" value="<?php echo  date("j F Y, G:i");?>" name="tgl"></td>
+											</tr>
+											<tr>
+												<td>Tanggal Expired</td>
+												<td><input type="date" required  class="form-control" name="tgl_expired"></td>
 											</tr>
 										</table>
 									</div>

@@ -14,7 +14,7 @@
               
               	  <p class="centered"><a><img src="assets/img/user/<?php echo $hasil_profil['gambar'];?>" class="img-circle" width="100" height="110"></a></p>
               	  <h5 class="centered"><?php echo $hasil_profil['nm_member'];?></h5>
-              	  <h5 class="centered">( <?php echo $hasil_profil['NIK'];?> )</h5>
+              	  <!-- <h5 class="centered">( <?php echo $hasil_profil['NIK'];?> )</h5> -->
               	  	
                   <li class="mt">
                       <a href="index.php">
@@ -32,6 +32,7 @@
                           <li><a  href="index.php?page=barang">Barang</a></li>
                           <li><a  href="index.php?page=kategori">Kategori</a></li>
                           <li><a  href="index.php?page=user">User</a></li>
+                          <li><a  href="index.php?page=userdata">User Data</a></li>
                       </ul>
                   </li>
                   <li class="sub-menu">
@@ -41,7 +42,17 @@
                       </a>
                       <ul class="sub">
                           <li><a  href="index.php?page=jual">Transaksi Jual</a></li>
+                          <li><a  href="index.php?page=pengeluaran">Pengeluran Toko</a></li>
                           <li><a  href="index.php?page=laporan">Laporan Penjualan</a></li>
+                      </ul>
+                  </li>
+                  <li class="sub-menu">
+                      <a href="javascript:;" >
+                          <i class="fa fa-upload"></i>
+                          <span>Backup & Restore <span style="padding-left:2px;"> <i class="fa fa-angle-down"></i></span></span>
+                      </a>
+                      <ul class="sub">
+                          <li><a href="index.php?page=backup">Backup Restore</a></li>
                       </ul>
                   </li>
                   <li class="sub-menu">
