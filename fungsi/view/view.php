@@ -206,12 +206,13 @@
 			}
 
 			function jual(){
-				$sql = "SELECT nota.*, barang.id_barang, barang.nama_barang, member.nm_member, transaksi.totalsemua, 
-						transaksi.bayar, transaksi.kembali, transaksi.diskon from nota
-						inner join barang on nota.id_barang = barang.id_barang
-						inner join member on nota.id_member = member.id_member
-						inner join transaksi on nota.invoice = transaksi.invoice
-						ORDER BY id_nota DESC";
+				// $sql = "SELECT nota.*, barang.id_barang, barang.nama_barang, member.nm_member, transaksi.totalsemua, 
+				// 		transaksi.bayar, transaksi.kembali, transaksi.diskon from nota
+				// 		inner join barang on nota.id_barang = barang.id_barang
+				// 		inner join member on nota.id_member = member.id_member
+				// 		inner join transaksi on nota.invoice = transaksi.invoice
+				// 		ORDER BY id_nota DESC";
+				$sql = "SELECT nota.invoice, SUM(nota.total) as total, GROUP_CONCAT(nota.jumlah) as jumlah, GROUP_CONCAT(barang.nama_barang) AS nama_barang, transaksi.diskon, transaksi.potongan, transaksi.totalsemua, transaksi.bayar, transaksi.kembali, member.nm_member FROM nota INNER JOIN transaksi ON nota.invoice = transaksi.invoice INNER JOIN barang ON nota.id_barang = barang.id_barang INNER JOIN member ON nota.id_member = member.id_member GROUP BY nota.invoice";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
@@ -252,7 +253,7 @@
 			}
 
 			function jumlah_nota(){
-				$sql ="SELECT SUM(total) as bayar FROM nota";
+				$sql ="SELECT SUM(totalsemua) as bayar FROM transaksi";
 				$row = $this -> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetch();
@@ -276,6 +277,7 @@
 				$hasil = $row -> fetchAll();
 				return $hasil;
 			}
+
 			function pengeluaran_tgl($tanggal1 , $tanggal2){
 				$sql = "select pengeluaran.*, kategori.id_kategori, kategori.nama_kategori
 						from pengeluaran inner join kategori on pengeluaran.id_kategori = kategori.id_kategori where pengeluaran.periode BETWEEN '$tanggal1' and '$tanggal2' ";
@@ -291,12 +293,59 @@
 				$row = $this -> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetch();
-				return $hasil;
-				
+				return $hasil;	
 			}
 
 			function user(){
-				$sql = "SELECT * FROM member";
+				$sql = "SELECT member.*, login.role FROM member LEFT JOIN login ON member.id_member = login.id_member";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function barang_stok(){
+				$sql = "SELECT stok FROM barang ORDER BY id_barang asc";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function barang_nama(){
+				$sql = "SELECT nama_barang FROM barang ORDER BY id_barang asc";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function pengeluaran_nominal(){
+				$sql = "SELECT periode, SUM(nominal) AS nominal FROM pengeluaran GROUP BY periode ORDER BY id ASC";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function pengeluaran_tanggal(){
+				$sql = "SELECT tanggal_input FROM pengeluaran ORDER BY id asc";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function transaksi_totsemua(){
+				$sql = "SELECT bulan, SUM(totalsemua) AS totalsemua FROM transaksi GROUP BY bulan ORDER BY id asc";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function expired(){
+				$sql = "SELECT * FROM barang";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();

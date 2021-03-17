@@ -27,6 +27,7 @@
         <script type="text/javascript" src="assets/datatables/jquery.dataTables.js"></script>
         <script type="text/javascript" src="assets/datatables/dataTables.bootstrap.js"></script>
         <script type="text/javascript" src="assets/js/jquery-2.2.3.min.js"></script>
+        <script type="text/javascript" src="assets/js/Chart.js"></script>
     <style>
 		.header{background:#328f6b; color:#fff;}
 		#main-content{ background:#fff;}
@@ -34,8 +35,8 @@
 	</style>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <sc src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></sc>
+      <sc src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></sc>
     <![endif]-->
   </head>
   <body>

@@ -129,58 +129,41 @@
 										// proses bayar dan ke nota
 									
 									if(!empty($_GET['nota'] == 'yes')) {
-										// $diskon = $_POST['disc'];
-										// $diskon = $_POST['diskon'];
-
-										$total = $_POST['total'];
 										$bayar = $_POST['pay'];
 										$kembali = $_POST['kembali'];
-										if(!empty($diskon)){
-											// $sisa =$total_bayar-$diskon;
-											// $sisa = $total_bayar - $rpdiskon; 
+										$id_barang = $_POST['id_barang'];
+										$id_member = $_POST['id_member'];
+										$invoice = $_POST['invoice'];
+										$jumlah = $_POST['jumlah'];
+										$total = $_POST['total'];
+										$tgl_input = $_POST['tgl_input'];
+										$periode = $_POST['periode'];
+										$jumlah_dipilih = count($id_barang);
+										
+										for($x=0;$x<$jumlah_dipilih;$x++){
+
+											$d = array($id_barang[$x],$id_member[$x],$invoice[$x],$jumlah[$x],$total[$x],$tgl_input[$x],$periode[$x]);
+											$sql = "INSERT INTO nota (id_barang,id_member,invoice,jumlah,total,tanggal_input,periode) VALUES(?,?,?,?,?,?,?)";
+											$row = $config->prepare($sql);
+											$row->execute($d);
+
+											// ubah stok barang
+											$sql_barang = "SELECT * FROM barang WHERE id_barang = ?";
+											$row_barang = $config->prepare($sql_barang);
+											$row_barang->execute(array($id_barang[$x]));
+											$hsl = $row_barang->fetch();
+											
+											$stok = $hsl['stok'];
+											$idb  = $hsl['id_barang'];
+
+											$total_stok = $stok - $jumlah[$x];
+											echo $total_stok;
+											$sql_stok = "UPDATE barang SET stok = ? WHERE id_barang = ?";
+											$row_stok = $config->prepare($sql_stok);
+											$row_stok->execute(array($total_stok, $idb));
+											
 										}
-
-										// if(!empty($bayar))
-										// {
-											// $hitung = $bayar - $sisa ;
-											// if($bayar = $total)
-											// {
-												$id_barang = $_POST['id_barang'];
-												$id_member = $_POST['id_member'];
-												$invoice = $_POST['invoice'];
-												$jumlah = $_POST['jumlah'];
-												$total = $_POST['total'];
-												$tgl_input = $_POST['tgl_input'];
-												$periode = $_POST['periode'];
-												// $disc = $_POST['disc'];
-												// $pay = $_POST['pay'];
-												// $kembali = $_POST['kembali'];
-												$jumlah_dipilih = count($id_barang);
-												
-												for($x=0;$x<$jumlah_dipilih;$x++){
-
-													$d = array($id_barang[$x],$id_member[$x],$invoice[$x],$jumlah[$x],$total[$x],$tgl_input[$x],$periode[$x]);
-													$sql = "INSERT INTO nota (id_barang,id_member,invoice,jumlah,total,tanggal_input,periode) VALUES(?,?,?,?,?,?,?)";
-													$row = $config->prepare($sql);
-													$row->execute($d);
-
-													// ubah stok barang
-													$sql_barang = "SELECT * FROM barang WHERE id_barang = ?";
-													$row_barang = $config->prepare($sql_barang);
-													$row_barang->execute(array($id_barang[$x]));
-													$hsl = $row_barang->fetch();
-													
-													$stok = $hsl['stok'];
-													$idb  = $hsl['id_barang'];
-
-													$total_stok = $stok - $jumlah[$x];
-													echo $total_stok;
-													$sql_stok = "UPDATE barang SET stok = ? WHERE id_barang = ?";
-													$row_stok = $config->prepare($sql_stok);
-													$row_stok->execute(array($total_stok, $idb));
-													
-												}
-												echo '<script>alert("Belanjaan Berhasil Di Bayar !");</script>';
+										echo '<script>alert("Belanjaan Berhasil Di Bayar !");</script>';
 											// }else{
 											// 	echo '<script>alert("Uang Kurang ! Rp.'.$hitung.'");</script>';
 											// }
@@ -211,11 +194,11 @@
 									</form>
 									<form action="print.php" method="get" target="_blank">
 										<td>Diskon %</td>
-										<td width='10%'><input type="text" class="form-control" id='txtdisc' onkeyup="sum();" name="disc"></td>
+										<td width='10%'><input type="text" class="form-control" id='txtdisc' onkeyup="diskon();" name="disc"></td>
 										<td>Total Semua  </td>
-										<td><input type="text" onkeyup="sum();" readonly="readonly" class="form-control" id="txttotakhir" name="totalakhir"></td>
+										<td><input type="text"  readonly="readonly" class="form-control"  id="txttotakhir" name="totalakhir"></td>
 										<td>Bayar  </td>
-										<td><input type="text" onkeyup="sum();" required class="form-control" id="txtbayar" name="pay"></td>
+										<td><input type="text"  required class="form-control" id="txtbayar" onkeyup="bayar();"  name="pay"></td>
 										<td>
 										<?php  if(!empty($_GET['nota'] == 'yes')) {?>
 											<a class="btn btn-danger" href="fungsi/hapus/hapus.php?penjualan=jual">
@@ -224,9 +207,9 @@
 									
 									<tr>
 										<td>Diskon Rp.</td>
-										<td width='10%'><input type="text" class="form-control" id='txtrp' onkeyup="sum();" name="disc"></td>
+										<td width='10%'><input type="text" class="form-control" onkeyup="potongan()" id='txtrp'  name="potongan"></td>
 										<td>Kembali</td>
-										<td><input type="text" class="form-control" readonly name="kembali" onkeyup="sum();" id="txtkembali"></td>
+										<td><input type="text" class="form-control" readonly name="kembali"  id="txtkembali"></td>
 										<?php $invoice = $lihat -> invoice_id(); ?>
 										<input type="hidden" name="totalbayar"  value="<?php echo $total_bayar ?>" id="">
 										<input type="hidden" name="member" value="<?php echo $_SESSION['kasir']['nm_member'];?>" id="">
@@ -237,7 +220,7 @@
 												<i class="fa fa-print"></i> Print Untuk Bukti Pembayaran
 											</button>
 										</td>
-										</form>
+									</form>
 									</tr>
 								</table>
 								<br/>
@@ -276,22 +259,32 @@ $(document).ready(function(){
 </script>
 
 <script>
-	function sum(){
+	function diskon(){
 		var txtdisc = document.getElementById('txtdisc').value;
-		var disrp = document.getElementById('txtrp').value;
 		var txtbayar = document.getElementById('txtbayar').value;
 		var diskon = <?php echo $total_bayar ?> * txtdisc/100;
 		var totalakhir = <?php echo $total_bayar ?> - diskon;
-		var totakhir = <?php echo $total_bayar ?> - disrp;
-		var kembali = txtbayar - totalakhir;
-		var back = txtbayar - totakhir;
-		 if(!isNaN(totakhir)){
-			document.getElementById('txttotakhir').value = totakhir ;
-			document.getElementById('txtkembali').value = back;	
-		}else if (!isNaN(totalakhir)) {
+		 if (!isNaN(totalakhir)) {
 			document.getElementById('txttotakhir').value = totalakhir ;
-			document.getElementById('txtkembali').value = kembali;	
+		}
+	}
+	function potongan(){
+		var disrp = document.getElementById('txtrp').value;
+		var totakhir = <?php echo $total_bayar ?> - disrp;
+		if(!isNaN(totakhir)){
+			document.getElementById('txttotakhir').value = totakhir ;
+		}
+	}
+	function bayar(){
+		var bayar = document.getElementById('txtbayar').value;
+		var akhir = document.getElementById('txttotakhir').value;
+		var kembali = bayar - akhir;	
+		if (!isNaN(kembali)) {
+			document.getElementById('txtkembali').value = kembali;
 		}
 	}
 </script>
-<!-- <script>window.print();</script> -->
+
+
+
+

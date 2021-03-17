@@ -59,13 +59,14 @@
 										<th>Telephone</th>
 										<th>Email</th>
 										<th>Foto</th>
+										<th>Role</th>
 										<th>Alamat</th>
 									</tr>
 								</thead>
 								<tbody>
 
 								<?php
-								$no = 1;
+								$no = 0;
 								$hasil = $lihat -> user();
 								foreach ($hasil as $hsl) {
 								$no++;
@@ -77,6 +78,7 @@
 										<td><?php echo $hsl['telepon'] ?></td>
 										<td><?php echo $hsl['email'] ?></td>
 										<td><img src="assets/img/user/<?php echo $hsl['gambar'];?>" width="80" alt=""></td>
+										<td><?php echo $hsl['role'] ?></td>
 										<td><?php echo $hsl['alamat_member'] ?></td>
 									</tr>
 									<?php } ?>

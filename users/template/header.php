@@ -27,6 +27,8 @@
         <script type="text/javascript" src="assets/datatables/jquery.dataTables.js"></script>
         <script type="text/javascript" src="assets/datatables/dataTables.bootstrap.js"></script>
         <script type="text/javascript" src="assets/js/jquery-2.2.3.min.js"></script>
+        <!-- chart -->
+        <script type="text/javascript" src="assets/js/Chart.js"></script>
     <style>
 		.header{background:#328f6b; color:#fff;}
 		#main-content{ background:#fff;}

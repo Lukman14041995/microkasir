@@ -15,21 +15,23 @@
 		$periode = $_GET['periode'];
 		$member = $_GET['member'];
 		$disc = $_GET['disc'];
+		$potongan = $_GET['potongan'];
 		$pay = $_GET['pay'];
 		$kembali = $_GET['kembali'];
 		$totalakhir = $_GET['totalakhir'];
 		$totalbayar = $_GET['totalbayar'];
 		$jumlah_dipilih = count($id_barang);
 		$periode = date("Y-m-d");	
+		$bulan = date("F");
 				
 		$q = mysqli_query($konek, "SELECT nota.*,barang.nama_barang FROM nota INNER JOIN barang ON nota.id_barang = barang.id_barang ");
 		$cek = mysqli_query($konek, "SELECT	* FROM transaksi WHERE invoice = '$invoice'");
 		$a = mysqli_fetch_array($q);
 		$nama_barang = $a['nama_barang'];
 		if ($q = mysqli_num_rows($cek) > 0 ) {
-			echo '<script>alert("Invoice Barang Sudah diPrint");window.location="index.php?page=jual"</script>';
+			echo '<script>alert("Sudah Diprint Silahkan Lanjut Pembayaran");window.location="index.php?page=jual"</script>';
 		}else {
-			$query = mysqli_query($konek, "INSERT INTO transaksi VALUES (NULL,'$invoice','$disc','$totalakhir','$pay','$kembali','$periode')");
+			$query = mysqli_query($konek, "INSERT INTO transaksi VALUES (NULL,'$invoice','$disc','$potongan','$totalakhir','$pay','$kembali','$periode','$bulan')");
 		}
 	}
 ?>
@@ -54,8 +56,6 @@
 						<p>Kasir : <?php  echo $member ;?></p>
 					</center>
 					<table class="table table-bordered" style="width:100%;">
-						<tr>
-
 							<td>Barang</td>
 							<td>Jumlah</td>
 							<td>Total</td>
@@ -67,12 +67,13 @@
 							<td><?php echo $isi['total'];?></td>
 						</tr>
 						<?php  }?>
-						
 					</table>
 					<div class="pull-right">
 						Jumlah : <?php echo number_format($totalbayar) ?>,-
 						<br>
 						Diskon : <?php echo $disc . "%"?>
+						<br/>
+						Potongan : Rp. <?php echo number_format($potongan) ?>
 						<br/>
 						Total : Rp.<?php echo number_format($totalakhir);?>,-
 						<br/>
@@ -82,7 +83,7 @@
 					</div>
 					<div class="clearfix"></div>
 					<center style="margin-top: 10px;">
-						<p>Terima Kasih Telah berbelanja di toko kami !</p>
+						<p>Terima Kasih Telah berbelanja di Roti~Qu !</p>
 					</center>
 				</div>
 				<div class="col-sm-4"></div>

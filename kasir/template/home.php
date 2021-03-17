@@ -29,6 +29,29 @@
 							";	
 						}
 					?>
+
+				  <?php 
+						$sql="SELECT * FROM barang WHERE tgl_expired <= now()";
+						$row = $config -> prepare($sql);
+						$row -> execute();
+						$r = $row -> fetchAll();
+						foreach($r as $q){
+					?>	
+				  <?php
+						echo "
+						<div class='alert alert-warning'>
+							<span class='glyphicon glyphicon-info-sign'></span> Stok  <a style='color:red'>". $q['nama_barang']."</a>  / <span style='color:red'> ID ". $q['id_barang']."</span> Kadaluarsa .  !! Pada tanggal <a style='color:red'>". $q['tgl_expired'] ."</a>
+							<span class='pull-right'><a href=''>OK</a></span>
+						</div>
+						";	
+					}
+				  ?>
+
+
+
+
+
+
 				  <?php $hasil_barang = $lihat -> barang_row();?>
 				  <?php $hasil_kategori = $lihat -> kategori_row();?>
 				  <?php $stok = $lihat -> barang_stok_row();?>

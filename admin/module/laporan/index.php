@@ -69,8 +69,8 @@
 										<th> Nama Barang</th>
 										<th> Jumlah</th>
 										<th> Total</th>
-										<th> Total Semua</th>
 										<th> Diskon</th>
+										<th> Total Semua</th>
 										<th> Bayar</th>
 										<th> Kembali</th>
 										<th> Kasir</th>
@@ -97,8 +97,8 @@
 										<td><?php echo $isi['nama_barang'];?></td>
 										<td><?php echo $isi['jumlah'];?> </td>
 										<td>Rp.<?php echo number_format($isi['total']);?>,-</td>
-										<td>Rp.<?php echo number_format($isi['totalsemua'])?>,-</td>
 										<td><?php echo $isi['diskon'] ?>%</td>
+										<td>Rp.<?php echo number_format($isi['totalsemua'])?>,-</td>
 										<td>Rp.<?php echo number_format($isi['bayar']) ?></td>
 										<td>Rp.<?php echo number_format($isi['kembali']) ?></td>
 										<td><?php echo $isi['nm_member'];?></td>
@@ -124,13 +124,13 @@
 								<thead>
 									<tr style="background:#DFF0D8;color:#333;">
 										<th> No</th>
-										<th> ID Barang</th>
 										<th> No. Invoice </th>
 										<th> Nama Barang</th>
 										<th> Jumlah</th>
 										<th> Total</th>
-										<th> Total Semua</th>
 										<th> Diskon</th>
+										<th> Potongan</th>
+										<th> Total Semua</th>
 										<th> Bayar</th>
 										<th> Kembali</th>
 										<th> Kasir</th>
@@ -149,13 +149,13 @@
 									?>
 									<tr>
 										<td><?php echo $no;?></td>
-										<td><?php echo $isi['id_barang'];?></td>
 										<td><?php echo $isi['invoice'];?></td>
 										<td><?php echo $isi['nama_barang'];?></td>
 										<td><?php echo $isi['jumlah'];?> </td>
 										<td>Rp.<?php echo number_format($isi['total']);?>,-</td>
-										<td>Rp.<?php echo number_format($isi['totalsemua']); ?>,-</td>
 										<td><?php echo $isi['diskon']."%" ?></td>
+										<td>Rp.<?php echo number_format($isi['potongan']);?>,-</td>
+										<td>Rp.<?php echo number_format($isi['totalsemua']); ?>,-</td>
 										<td>Rp.<?php echo number_format($isi['bayar']); ?>,-</td>
 										<td>Rp.<?php echo number_format($isi['kembali']) ?>,-</td>
 										<td><?php echo $isi['nm_member'];?></td>
@@ -167,10 +167,10 @@
 								<tfoot>
 									<tr>
 										<th colspan="4">Total Terjual</td>
-										<th><?php echo $jumlah;?></td>
 										<th>Rp.<?php echo number_format($bayar);?>,-</td>
+										<th colspan="2" style="background:#ddd"></th>
 										<th>Rp.<?php echo number_format($totalsemua);?>,-</td>
-										<th colspan="6" style="background:#ddd"></th>
+										<th colspan="5" style="background:#ddd"></th>
 									</tr>
 								</tfoot>
 							</table>

@@ -18,6 +18,14 @@ if(!empty($_SESSION['admin'])){
 		$row -> execute($data);
 		echo '<script>window.location="../../index.php?page=barang&&remove=hapus-data"</script>';
 	}
+	if(!empty($_GET['expired'])){
+		$id= $_GET['id'];
+		$data[] = $id;
+		$sql = 'DELETE FROM barang WHERE id_barang=?';
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo '<script>window.location="../../index.php"</script>';
+	}
 	if(!empty($_GET['jual'])){
 		
 		$dataI[] = $_GET['brg'];

@@ -352,4 +352,74 @@ if(!empty($_SESSION['admin'])){
 			window.location='../../index.php?page=jual#keranjang'</script>";
 		}
 	}
+}elseif (!empty($_SESSION['superuser'])) {
+	require '../../config.php';
+	if (!empty($_GET['gambar'])) {
+		$id = htmlentities($_POST['id']);
+		set_time_limit(0);
+		$allowedImageType = array("image/gif",   "image/JPG",   "image/jpeg",   "image/pjpeg",   "image/png",   "image/x-png"  );
+		
+		if ($_FILES['foto']["error"] > 0) {
+			$output['error']= "Error in File";
+		} elseif (!in_array($_FILES['foto']["type"], $allowedImageType)) {
+			echo "You can only upload JPG, PNG and GIF file";
+			echo "<font face='Verdana' size='2' ><BR><BR><BR>
+					<a href='../../index.php?page=user'>Back to upform</a><BR>";
+
+		}elseif (round($_FILES['foto']["size"] / 1024) > 4096) {
+			echo "WARNING !!! Besar Gambar Tidak Boleh Lebih Dari 4 MB";
+			echo "<font face='Verdana' size='2' ><BR><BR><BR>
+					<a href='../../index.php?page=user'>Back to upform</a><BR>";
+
+		}else {
+			$target_path = '../../assets/img/user/';
+			$target_path = $target_path . basename($_FILES['foto']['name']);
+			if (file_exists("$target_path")) {
+				echo "<font face = 'Verdana' size = '2'>Ini Terjadi karena Telah Masuk Nama File Yang sama, <br> Silahkan Rename file terlebih dahulu <br>";
+				echo "<font face='Verdana' size='2' ><BR><BR><BR>
+					<a href='../../index.php?page=user'>Back to upform</a><BR>";
+			}elseif (move_uploaded_file($_FILES['foto']['tmp_name'], $target_path)) {
+				$foto2 = $_POST['foto2'];
+				unlink('../../assets/img/user/'.$foto2.'');
+				$id = $_POST['id'];
+				$data[] = $_FILES['foto']['name'];
+				$data[] = $id;
+				$sql = 'UPDATE member SET gambar = ? WHERE member.id_member = ?';
+				$row = $config -> prepare($sql);
+				$row -> execute($data);
+				echo "<script>window.location='../../index.php?page=user&success=edit-data'</script>";
+			}
+		}
+	}
+	if (!empty($_GET['profil'])) {
+		$id = htmlentities($_POST['id']);
+		$nama = htmlentities($_POST['nama']);
+		$alamat = htmlentities($_POST['alamat']);
+		$tlp = htmlentities($_POST['tlp']);
+		$email = htmlentities($_POST['email']);
+		$nik = htmlentities($_POST['nik']);
+
+		$data[] = $nama;
+		$data[] = $alamat;
+		$data[] = $tlp;
+		$data[] = $email;
+		$data[] = $nik;
+		$data[] = $id;
+		$sql = 'UPDATE member SET nm_member=?, alamat_member=?, telepon=?, email=?, NIK=? WHERE id_member=?';
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo "<script>window.location='../../index.php?page=user&success=edit-data'</script>";
+	}
+	if (!empty($_GET['pass'])) {
+		$id = htmlentities($_POST['id']);
+		$user = htmlentities($_POST['user']);
+		$pass = htmlentities($_POST['pass']);
+
+		$data[] = $user;
+		$data[] = $pass;
+		$sql = 'UPDATE login SET user =? , pass=md5(?) WHERE id_member =?';
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo "<script>window.location.href='../../index.php?page=user&success=edit-data'</script>";
+	}
 }

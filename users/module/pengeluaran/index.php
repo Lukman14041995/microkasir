@@ -31,7 +31,7 @@
 							?>
 						</h3>
 						<br/>
-						<h4>Cari Laporan Per Bulan</h4>
+						<h4>Cari Laporan Per Tanggal</h4>
 						<form method="post" action="index.php?page=pengeluaran&cari=ok">
 							<table class="table table-striped">
 								<tr>

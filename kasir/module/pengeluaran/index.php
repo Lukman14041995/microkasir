@@ -3,17 +3,7 @@
       <!-- **********************************************************************************************************************************************************
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
-      <!--main content start-->
-	  <script type="text/javascript">
-		window.onload = function () {
-			var table = document.getElementById('data-table'),
-			download = document.getElementById('download');
-
-			download.addEventListener('click', function () {
-			window.open('data:application/vnd.ms-excel,' + encodeURIComponent(table.outerHTML));
-			});
-  }
-		</script>
+      <!--main content start--> 
 
 
       <section id="main-content">

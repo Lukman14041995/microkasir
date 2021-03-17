@@ -42,6 +42,23 @@
 								";	
 							}
 						?>
+
+						<?php 
+							$sql1="SELECT * FROM barang WHERE tgl_expired <= now()";
+							$row1 = $config -> prepare($sql1);
+							$row1 -> execute();
+							$r = $row1 -> fetchAll();
+							foreach($r as $q){
+						?>	
+						<?php
+								echo "
+								<div class='alert alert-warning'>
+									<span class='glyphicon glyphicon-info-sign'></span> Stok  <a style='color:red'>". $q['nama_barang']."</a>  / <span style='color:red'> ID ". $q['id_barang']."</span> Kadaluarsa . !! Pada Tanggal " . $q['tgl_expired'] ."
+									<span class='pull-right'><a href='fungsi/hapus/hapus.php?expired=hapus&id=". $q['id_barang'] ."'>OK</a></span>
+								</div>
+								";	
+							}
+						?>
 						
 						<!-- Trigger the modal with a button -->
 						<button type="button" class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="#myModal">

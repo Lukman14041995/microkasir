@@ -29,13 +29,47 @@
 							";	
 						}
 					?>
-				  <?php $hasil_barang = $lihat -> barang_row();?>
-				  <?php $hasil_kategori = $lihat -> kategori_row();?>
-				  <?php $stok = $lihat -> barang_stok_row();?>
-				  <?php $jual = $lihat -> jual_row();?>
-				  <?php $total = $lihat -> total_row();?>
-				  <?php $nota = $lihat -> jumlah_nota(); ?>
-				  <?php $pengeluaran = $lihat -> jml_pengeluaran(); ?>
+					<?php 
+						$sql="SELECT * FROM barang WHERE tgl_expired <= now()";
+						$row = $config -> prepare($sql);
+						$row -> execute();
+						$r = $row -> fetchAll();
+						foreach($r as $q){
+					?>	
+				    <?php
+						echo "
+						<div class='alert alert-warning'>
+							<span class='glyphicon glyphicon-info-sign'></span> Stok  <a style='color:red'>". $q['nama_barang']."</a>  / <span style='color:red'> ID ". $q['id_barang']."</span> Kadaluarsa .  !! Pada tanggal <a style='color:red'>". $q['tgl_expired'] ."</a>
+							<span class='pull-right'><a href=''>OK</a></span>
+						</div>
+						";	
+				 	}
+				    ?>
+				 <?php 
+	// lihat
+	$hasil_barang = $lihat -> barang_row();
+	$hasil_kategori = $lihat -> kategori_row();
+	$stok = $lihat -> barang_stok_row();
+	$jual = $lihat -> jual_row();
+	$total = $lihat -> total_row();
+	$nota = $lihat -> jumlah_nota(); 
+	$pengeluaran = $lihat -> jml_pengeluaran(); 
+	$brg_stok = $lihat -> barang_stok();
+	$brg_nama = $lihat -> barang_nama();
+	$pengeluaran_nominal = $lihat -> pengeluaran_nominal();
+	$pengeluaran_tanggal = $lihat -> pengeluaran_tanggal();
+	$transaksi_totsemua = $lihat -> transaksi_totsemua();
+	$bulan = $lihat -> bulan();
+
+	?>				
+					<div class="row">
+						<div class="col-md-6">
+							<div class="card">
+							<h4>Chart Barang</h4>
+							<canvas id="brg"></canvas>
+							</div>
+						</div>
+					</div>
                     <div class="row">
                       <!--STATUS PANELS -->
                       	<div class="col-md-3">
@@ -146,3 +180,42 @@
 	  </section>
   </section>
 
+  <script  type="text/javascript">
+  var ctx = document.getElementById("brg").getContext("2d");
+  var data = {
+            labels: [<?php foreach ($brg_nama as $bn) {
+               echo '"' . $bn['nama_barang'] . '",';
+               }?>],
+            datasets: [
+            {
+              label: "Pengeluaran Barang",
+              data: [<?php foreach ($brg_stok as $bs) { 
+				  echo '"' . $bs['stok'] . '",';}?>],
+            }
+            ],
+			
+            };
+
+  var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+            legend: {
+              display: false
+            },
+            barValueSpacing: 20,
+            scales: {
+              yAxes: [{
+                  ticks: {
+                      min: 0,
+                  }
+              }],
+              xAxes: [{
+                          gridLines: {
+                              color: "rgba(0, 0, 0, 0)",
+                          }
+                      }]
+              }
+          }
+        });
+</script>

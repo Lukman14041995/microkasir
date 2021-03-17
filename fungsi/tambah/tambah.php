@@ -22,6 +22,8 @@ if(!empty($_SESSION['admin'])){
 		$satuan = $_POST['satuan'];
 		$stok = $_POST['stok'];
 		$tgl = $_POST['tgl'];
+		$tgl_inp = date('Y-m-d');
+		$tgl_exp = $_POST['tgl_expired'];
 		
 		$data[] = $id;
 		$data[] = $kategori;
@@ -32,8 +34,10 @@ if(!empty($_SESSION['admin'])){
 		$data[] = $satuan;
 		$data[] = $stok;
 		$data[] = $tgl;
-		$sql = 'INSERT INTO barang (id_barang,id_kategori,nama_barang,merk,harga_beli,harga_jual,satuan_barang,stok,tgl_input) 
-			    VALUES (?,?,?,?,?,?,?,?,?) ';
+		$data[] = $tgl_inp;
+		$data[] = $tgl_exp;
+		$sql = 'INSERT INTO barang (id_barang,id_kategori,nama_barang,merk,harga_beli,harga_jual,satuan_barang,stok,tgl_input,input_tgl,tgl_expired) 
+			    VALUES (?,?,?,?,?,?,?,?,?,?,?) ';
 		$row = $config -> prepare($sql);
 		$row -> execute($data);
 		echo '<script>window.location="../../index.php?page=barang&success=tambah-data"</script>';
@@ -135,22 +139,6 @@ if(!empty($_SESSION['admin'])){
 					
 					echo '<script>window.location="../../index.php?page=userdata&success=tambah-data"</script>';
 				}
-				// $data3[] = $nama;
-				// $data3[] = $alamat;
-				// $data3[] = $telp;
-				// $data3[] = $email;
-				// $data3[] = $foto;
-				// $data3[] = $nik;
-				// $sql3 = "INSERT INTO member (nm_member, alamat_member, telepon, email, gambar, NIK) VALUES (?,?,?,?,?,?) ";
-				// $row3 = $config -> prepare($sql3);
-				// $row3 -> execute($data3);
-
-				// if ($row3 = true) {
-				// 	$view = "SELECT id_member FROM member order by id_member desc ";
-				// 	$a = mysqli_fetch_array($view);
-				// }
-				
-				// echo '<script>window.location="../../index.php?page=userdata&success=tambah-data"</script>';
 				
 			}
 		}
@@ -176,5 +164,30 @@ if(!empty($_SESSION['admin'])){
 		$row1 = $config -> prepare($sql1);
 		$row1 -> execute($data1);
  		echo '<script>window.location="../../index.php?page=jual&success=tambah-data"</script>';
+	}
+}elseif (!empty($_SESSION['superuser'])) {
+	require "../../config.php";
+	if (!empty($_GET['pengeluaran'])) {
+		$nopengeluaran = $_POST['nopeng'];
+		$kategori = $_POST['kategori'];
+		$guna = $_POST['guna'];
+		$barang = $_POST['barang'];
+		$nominal = $_POST['nominal'];
+		$oleh = $_POST['oleh'];
+		$tgl = date("j F Y, G:i");
+		$periode = date("Y-m-d");
+
+		$data[] = $nopengeluaran;
+		$data[] = $kategori;
+		$data[] = $guna;
+		$data[] = $barang;
+		$data[] = $nominal;
+		$data[] = $oleh;
+		$data[] = $tgl;
+		$data[] = $periode;
+		$sql = "INSERT INTO pengeluaran (no_pengeluaran,id_kategori, guna, barang, nominal, oleh, tanggal_input, periode) VALUES (?,?,?,?,?,?,?,?)";
+		$row = $config -> prepare($sql);
+		$row -> execute($data);
+		echo "<script>window.location='../../index.php?page=pengeluaran&success=tambah-data'</script>";
 	}
 }
