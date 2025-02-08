@@ -8,11 +8,13 @@
 		  $id = $_SESSION['kasir']['id_member'];
 		  $hasil = $lihat -> member_edit($id);
       ?>
-      <section id="main-content">
-          <section class="wrapper">
+      <!-- <div class="container-fluid"> -->
+          <!-- <section class="wrapper"> -->
               <div class="row">
                   <div class="col-lg-12 main-chart">
-						<h3>Profil Pengguna Aplikasi</h3>
+						<div class="card">
+ 							<div class="card-body">
+							 <h3>Profil Pengguna Aplikasi</h3>
 						<br>
 						<?php if(isset($_GET['success'])){?>
 						<div class="alert alert-success">
@@ -24,6 +26,7 @@
 							<p>Hapus Data Berhasil !</p>
 						</div>
 						<?php }?>
+							<div class="row">
 							<div class="col-sm-3">
 								<div class="panel panel-primary">
 									<div class="panel-heading">
@@ -31,13 +34,13 @@
 									<div class="panel-body">
 										<center><img src="assets/img/user/<?php echo $hasil['gambar'];?>"  alt="#" style="width:200px;border:4px solid #ddd;"/></center>			
 									</div>
-									<div class="panel-footer">
+									<div class="panel-footer mt-3">
 										<form method="POST" action="fungsi/edit/edit.php?gambar=user" enctype="multipart/form-data">
 											<input type="file" accept="image/*" name="foto">
 											<input type="hidden" value="<?php echo $hasil['gambar'];?>" name="foto2">
 											<input type="hidden"  name="id" value="<?php echo $hasil['id_member'];?>">
-											<span class="pull-right">
-												<button type="submit"  class="btn btn-primary btn-sm" value="Tambah"><i class="fa fa-pencil"> Ganti Foto</i></button>
+											<span class="pull-right ">
+												<button type="submit"  class="btn btn-primary btn-sm" style="margin-top: 10px;" value="Tambah"><i class="fa fa-pencil"> Ganti Foto</i></button>
 											</span>
 										</form>
 										<br/>
@@ -57,37 +60,41 @@
 													<div class="control-group">
 														<label class="control-label" for="typeahead">Nama </label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-user"></i>
-														  </div>
-															<input type="text" class="form-control" style="border-radius:0px;" name="nama" data-items="4" value="<?php echo $hasil['nm_member']; ?>" required="required"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
+															</div>
+															<input type="text" name="nama" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" value="<?php echo $hasil['nm_member']; ?>" required="required">
 														</div>
 													</div>
 													<div class="control-group">
 														<label class="control-label" for="typeahead">Email </label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-envelope-square"></i>
-														  </div>
-															<input type="email" class="form-control" style="border-radius:0px;" name="email" value="<?php echo $hasil['email']; ?>" required="required"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope-square"></i></span>
+															</div>
+															<input type="text" name="email" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" name="email" value="<?php echo $hasil['email']; ?>" required="required">
 														</div>
 													</div>
 													<div class="control-group">
 														<label class="control-label" for="typeahead">Telepon </label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-phone"></i>
-														  </div>
-															<input type="text" class="form-control" style="border-radius:0px;" name="tlp" value="<?php echo $hasil['telepon']; ?>" required="required"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-phone"></i></span>
+															</div>
+															<input type="text" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" name="tlp" value="<?php echo $hasil['telepon']; ?>" required="required">
 														</div>
 													</div>
 													<div class="control-group">
 														<label class="control-label" for="typeahead">NIK ( KTP ) </label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-user"></i>
-														  </div>
-															<input type="text" class="form-control" style="border-radius:0px;" name="nik" value="<?php echo $hasil['NIK']; ?>" required="required"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
+															</div>
+															<input type="text" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" name="nik" value="<?php echo $hasil['NIK']; ?>" required="required">
 														</div>
 													</div>
 													<div class="control-group">
@@ -120,19 +127,21 @@
 													<div class="control-group">
 														<label class="control-label" for="typeahead">Username </label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-user"></i>
-														  </div>
-															<input type="text" class="form-control" style="border-radius:0px;" name="user" data-items="4" value="<?php echo $hasil['user'];?>"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
+															</div>
+															<input type="text" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" name="user" data-items="4" value="<?php echo $hasil['user'];?>">
 														</div>
 													</div>
 													<div class="control-group">
 														<label class="control-label" for="typeahead">Password Baru</label>
 														<div class="input-group">
-														  <div class="input-group-addon">
-															<i class="fa fa-lock"></i>
-														  </div>
-															<input type="password" class="form-control" placeholder="Enter Your New Password" style="border-radius:0px;" id="pass" name="pass" data-items="4" value="" required="required"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="basic-addon1"><i class="fa fa-lock"></i></span>
+															</div>
+															<input type="text" class="form-control"
+																aria-label="Username" aria-describedby="basic-addon1" id="pass" name="pass" required>
 														</div>
 													</div>
 													<br>
@@ -146,11 +155,14 @@
 									</div>
 								</div>
 							</div>
+							</div>
 						</div>
 					</div>
 					<div class="clearfix" style="padding-top:5%;"></div>
+							 </div>
+						</div>
 				  </div>
               </div>
-          </section>
-      </section>
+          <!-- </section> -->
+      <!-- </div> -->
 	

@@ -3,8 +3,7 @@
       <!-- **********************************************************************************************************************************************************
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
-      <!--main content start--> 
-
+      <!--main content start-->
 
       <section id="main-content">
           <section class="wrapper">
@@ -21,7 +20,7 @@
 							?>
 						</h3>
 						<br/>
-						<h4>Cari Laporan Per Bulan</h4>
+						<h4>Cari Laporan Per Tanggal</h4>
 						<form method="post" action="index.php?page=pengeluaran&cari=ok">
 							<table class="table table-striped">
 								<tr>
@@ -63,8 +62,10 @@
 			
 
 						<!-- Trigger the modal with a button -->
-
-						<a href="excel.php" class="btn btn-success btn-md pull-left">
+						<?php 
+						$id = $_SESSION['kasir']['id_cabang'];
+						?>
+						<a href="excel.php?id=<?php echo $id ?>" class="btn btn-success btn-md pull-left">
 							<i class="fa fa-print"></i> Export Excel</a>
 						<button type="button" class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="#myModal">
 							<i class="fa fa-plus"></i> Insert Data</button>
@@ -82,9 +83,9 @@
 									<tr style="background:#DFF0D8;color:#333;">
 										<th> No</th>
 										<th> No. Pengeluaran</th>
-										<th> Guna</th>
+										<th> Keperluan</th>
 										<th> Barang</th>
-										<th style="width:10%;"> Kategori</th>
+										<!-- <th style="width:10%;"> Kategori</th> -->
 										<th style="width:20%;"> Nominal</th>
 										<th> Oleh</th>
 										<th> Tanggal Input</th>
@@ -97,8 +98,14 @@
 										$no=1; 
 										$jumlah = 0;
 										$bayar = 0;
-										$hasil = $lihat -> pengeluaran_tgl($tanggal1 ,$tanggal2);
-										foreach($hasil as $isi){
+										require "konfig.php";
+										$id = $_SESSION['kasir']['id_cabang'];
+										$query = mysqli_query($koneksi,"SELECT *
+										from pengeluaran 
+										WHERE id_cabang = '$id' and periode BETWEEN '$tanggal1' and '$tanggal2'");
+										while ($isi = mysqli_fetch_array($query)) {
+										// $hasil = $lihat -> pengeluaran_tgl($tanggal1 ,$tanggal2);
+										// foreach($hasil as $isi){
 											$pay += $isi['nominal'];
 											$jumlah += $isi['jumlah'];
 									?>
@@ -107,7 +114,7 @@
 										<td><?php echo $isi['no_pengeluaran'];?></td>
 										<td><?php echo $isi['guna'];?></td>
 										<td><?php echo $isi['barang'];?></td>
-										<td><?php echo $isi['nama_kategori'];?> </td>
+										<!-- <td><?php echo $isi['nama_kategori'];?> </td> -->
 										<td>Rp.<?php echo number_format($isi['nominal']);?>,-</td>
 										<td><?php echo $isi['oleh'];?></td>
 										<td><?php echo $isi['tanggal_input'];?></td>
@@ -117,10 +124,10 @@
 								</tbody>
 								<tfoot>
 								<tr>
-										<th colspan="5">Total Pengeluaran</td>
+										<th colspan="4">Total Pengeluaran</td>
 										<!-- <th></td> -->
 										<th>Rp.<?php echo number_format($pay);?>,-</td>
-										<th colspan="2" style="background:#ddd"></th>
+										<th colspan="3" style="background:#ddd"></th>
 									</tr>
 								</tfoot>
 							</table>
@@ -133,20 +140,26 @@
 									<tr style="background:#DFF0D8;color:#333;">
 										<th> No</th>
 										<th> No. Pengeluaran</th>
-										<th> Guna</th>
+										<th> Keperluan</th>
 										<th> Barang</th>
-										<th style="width:10%;"> Kategori</th>
+										<!-- <th style="width:10%;"> Kategori</th> -->
 										<th style="width:20%;"> Nominal</th>
 										<th> Oleh</th>
 										<th> Tanggal Input</th>
 									</tr>
 								</thead>
 								<tbody>
-									<?php $no=1; $hasil = $lihat -> pengeluaran();?>
+									<?php $no=1;
+									//  $hasil = $lihat -> pengeluaran();?>
 									<?php 
-										$bayar = 0;
-										$jumlah = 0;
-										foreach($hasil as $isi){ 
+										// foreach($hasil as $isi){ 
+									$id = $_SESSION['kasir']['id_cabang'];
+									require "konfig.php";
+									$query = mysqli_query($koneksi, "SELECT *
+													      from pengeluaran
+														  WHERE id_cabang = '$id'");
+									while ($isi = mysqli_fetch_array($query)) {
+										
 											$pay += $isi['nominal'];
 											$jumlah += $isi['jumlah'];
 									?>
@@ -155,7 +168,7 @@
 										<td><?php echo $isi['no_pengeluaran'];?></td>
 										<td><?php echo $isi['guna'];?></td>
 										<td><?php echo $isi['barang'];?></td>
-										<td><?php echo $isi['nama_kategori'];?> </td>
+										<!-- <td><?php echo $isi['nama_kategori'];?> </td> -->
 										<td>Rp.<?php echo number_format($isi['nominal']);?>,-</td>
 										<td><?php echo $isi['oleh'];?></td>
 										<td><?php echo $isi['tanggal_input'];?></td>
@@ -165,10 +178,10 @@
 								</tbody>
 								<tfoot>
 									<tr>
-										<th colspan="5">Total Pengeluaran</td>
+										<th colspan="4">Total Pengeluaran</td>
 										<!-- <th></td> -->
 										<th>Rp.<?php echo number_format($pay);?>,-</td>
-										<th colspan="2" style="background:#ddd"></th>
+										<th colspan="3" style="background:#ddd"></th>
 									</tr>
 								</tfoot>
 							</table>
@@ -186,7 +199,7 @@
 						<div class="modal-content" style=" border-radius:0px;">
 						<div class="modal-header" style="background:#285c64;color:#fff;">
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><i class="fa fa-plus"></i> Tambah Barang</h4>
+							<h4 class="modal-title"><i class="fa fa-plus"></i> Tambah Data</h4>
 						</div>										
 						<form action="fungsi/tambah/tambah.php?pengeluaran=tambah" method="POST">
 							<div class="modal-body">
@@ -194,26 +207,29 @@
 								<table class="table table-striped bordered">
 									
 									<?php
+										$id = $_SESSION['kasir']['id_cabang'];
 										$value = $lihat -> pengeluaran_id();
 									?>
 									<tr>
+											<input type="hidden" value="<?php echo $id ?>" name="id_cabang">
 										<td>No. Pengeluaran</td>
 										<td><input type="text" readonly="readonly" required value="<?php echo $value;?>" class="form-control"  name="nopeng"></td>
 									</tr>
-									<tr>
+									<!-- <tr>
 										<td>Kategori</td>
-										<td>
-										<select name="kategori" class="form-control" required>
+										<td> -->
+										<input type="hidden" name="kategori">
+										<!-- <select name="kategori" class="form-control" required>
 											<option value="#">Pilih Kategori</option>
 											<?php  $kat = $lihat -> kategori(); foreach($kat as $isi){ 	?>
 											<option value="<?php echo $isi['id_kategori'];?>"><?php echo $isi['nama_kategori'];?></option>
 											<?php }?>
-										</select>
-										</td>
-									</tr>
+										</select> -->
+										<!-- </td>
+									</tr> -->
 									<tr>
-										<td>Guna</td>
-										<td><input type="text" placeholder="Guna" required class="form-control" name="guna"></td>
+										<td>Keperluan</td>
+										<td><input type="text" placeholder="Keperluan" required class="form-control" name="guna"></td>
 									</tr>
 									<tr>
 										<td>Barang</td>
@@ -245,38 +261,7 @@
           </section>
       </section>
 
-	  <script>
-	  function exportTableToExcel(example1, filename = ''){
-		var downloadLink;
-		var dataType = 'application/vnd.ms-excel';
-		var tableSelect = document.getElementById(example1);
-		var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-		
-		// Specify file name
-		filename = filename?filename+'.xls':'excel_data.xls';
-		
-		// Create download link element
-		downloadLink = document.createElement("a");
-		
-		document.body.appendChild(downloadLink);
-		
-		if(navigator.msSaveOrOpenBlob){
-			var blob = new Blob(['\ufeff', tableHTML], {
-				type: dataType
-			});
-			navigator.msSaveOrOpenBlob( blob, filename);
-		}else{
-			// Create a link to the file
-			downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-		
-			// Setting the file name
-			downloadLink.download = filename;
-			
-			//triggering the function
-			downloadLink.click();
-		}
-	}
-	  </script>
+	  
 	
 
 

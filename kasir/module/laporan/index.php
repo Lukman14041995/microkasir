@@ -1,4 +1,5 @@
- <!--sidebar end-->   
+ <!--sidebar end-->
+      
       <!-- **********************************************************************************************************************************************************
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
@@ -50,8 +51,8 @@
 								</tr>
 							</table>
 						</form>
-						
-						<a href="exceljual.php" style="margin-top: 10px;" class="btn btn-success btn-md pull-left">
+						<?php $id = $_SESSION['kasir']['id_cabang']; ?>
+						<a href="exceljual.php?id=<?php echo $id ?>" style="margin-top: 10px;" class="btn btn-success btn-md pull-left">
 							<i class="fa fa-print"></i> Export Excel</a>
 						<div class="clearfix" style="border-top:1px solid #ccc;"></div>
 						<br/>
@@ -63,13 +64,12 @@
 								<thead>
 									<tr style="background:#DFF0D8;color:#333;">
 									<th> No</th>
-										<th> ID Barang</th>
 										<th> No. Invoice </th>
 										<th> Nama Barang</th>
 										<th> Jumlah</th>
 										<th> Total</th>
-										<th> Total Semua</th>
 										<th> Diskon</th>
+										<th> Total Semua</th>
 										<th> Bayar</th>
 										<th> Kembali</th>
 										<th> Kasir</th>
@@ -83,20 +83,33 @@
 										$no=1; 
 										$jumlah = 0;
 										$bayar = 0;
-										$hasil = $lihat -> periode_jual($tanggal1 ,$tanggal2);
-										foreach($hasil as $isi){
+										// $hasil = $lihat -> periode_jual($tanggal1 ,$tanggal2);
+										// foreach($hasil as $isi){
+										require "konfig.php";
+										$id = $_SESSION['kasir']['id_cabang'];
+										$query = mysqli_query($koneksi, 
+										"SELECT nota.invoice, SUM(nota.total) as total,
+										GROUP_CONCAT(nota.jumlah) as jumlah, GROUP_CONCAT(barang.nama_barang) AS nama_barang,
+										nota.tanggal_input, transaksi.diskon, transaksi.potongan, transaksi.totalsemua,
+										transaksi.bayar, transaksi.kembali, transaksi.id_cabang, member.nm_member
+										FROM nota INNER JOIN transaksi ON nota.invoice = transaksi.invoice 
+										INNER JOIN barang ON nota.id_barang = barang.id_barang 
+										INNER JOIN member ON nota.id_member = member.id_member
+										WHERE transaksi.id_cabang = '$id' and nota.periode between '$tanggal1' and '$tanggal2' 
+										GROUP BY nota.invoice");	
+										while ($isi = mysqli_fetch_array($query)) {
 											$bayar += $isi['total'];
 											$jumlah += $isi['jumlah'];
+											$totalsemua += $isi['totalsemua'];
 									?>
 									<tr>
-									<td><?php echo $no;?></td>
-										<td><?php echo $isi['id_barang'];?></td>
+										<td><?php echo $no;?></td>
 										<td><?php echo $isi['invoice'];?></td>
 										<td><?php echo $isi['nama_barang'];?></td>
 										<td><?php echo $isi['jumlah'];?> </td>
 										<td>Rp.<?php echo number_format($isi['total']);?>,-</td>
-										<td>Rp.<?php echo number_format($isi['totalsemua'])?>,-</td>
 										<td><?php echo $isi['diskon'] ?>%</td>
+										<td>Rp.<?php echo number_format($isi['totalsemua'])?>,-</td>
 										<td>Rp.<?php echo number_format($isi['bayar']) ?></td>
 										<td>Rp.<?php echo number_format($isi['kembali']) ?></td>
 										<td><?php echo $isi['nm_member'];?></td>
@@ -122,13 +135,13 @@
 								<thead>
 									<tr style="background:#DFF0D8;color:#333;">
 										<th> No</th>
-										<th> ID Barang</th>
 										<th> No. Invoice </th>
 										<th> Nama Barang</th>
 										<th> Jumlah</th>
 										<th> Total</th>
-										<th> Total Semua</th>
 										<th> Diskon</th>
+										<th> Potongan</th>
+										<th> Total Semua</th>
 										<th> Bayar</th>
 										<th> Kembali</th>
 										<th> Kasir</th>
@@ -140,20 +153,32 @@
 									<?php 
 										$bayar = 0;
 										$jumlah = 0;
-										foreach($hasil as $isi){ 
+									$id = $_SESSION['kasir']['id_cabang'];
+									require "konfig.php";
+									$query = mysqli_query($koneksi, 
+									"SELECT nota.invoice, SUM(nota.total) as total,
+									 GROUP_CONCAT(nota.jumlah) as jumlah, GROUP_CONCAT(barang.nama_barang) AS nama_barang,
+									 nota.tanggal_input, transaksi.diskon, transaksi.potongan, transaksi.totalsemua,
+									 transaksi.bayar, transaksi.kembali, transaksi.id_cabang, member.nm_member
+									 FROM nota INNER JOIN transaksi ON nota.invoice = transaksi.invoice 
+									 INNER JOIN barang ON nota.id_barang = barang.id_barang 
+									 INNER JOIN member ON nota.id_member = member.id_member
+									 WHERE transaksi.id_cabang = '$id' 
+									 GROUP BY nota.invoice");
+									while ($isi = mysqli_fetch_array($query)) {
 											$bayar += $isi['total'];
 											$jumlah += $isi['jumlah'];
 											$totalsemua += $isi['totalsemua'];
 									?>
 									<tr>
 										<td><?php echo $no;?></td>
-										<td><?php echo $isi['id_barang'];?></td>
 										<td><?php echo $isi['invoice'];?></td>
 										<td><?php echo $isi['nama_barang'];?></td>
 										<td><?php echo $isi['jumlah'];?> </td>
 										<td>Rp.<?php echo number_format($isi['total']);?>,-</td>
-										<td>Rp.<?php echo number_format($isi['totalsemua']); ?>,-</td>
 										<td><?php echo $isi['diskon']."%" ?></td>
+										<td>Rp.<?php echo number_format($isi['potongan']);?>,-</td>
+										<td>Rp.<?php echo number_format($isi['totalsemua']); ?>,-</td>
 										<td>Rp.<?php echo number_format($isi['bayar']); ?>,-</td>
 										<td>Rp.<?php echo number_format($isi['kembali']) ?>,-</td>
 										<td><?php echo $isi['nm_member'];?></td>
@@ -164,16 +189,16 @@
 								</tbody>
 								<tfoot>
 									<tr>
-										<td colspan="4">Total Terjual</td>
-										<td><?php echo $jumlah;?></td>
-										<td>Rp.<?php echo number_format($bayar);?>,-</td>
-										<!-- <th>Rp.<?php echo number_format($totalsemua);?>,-</td> -->
-										<td colspan="6" style="background:#ddd"></td>
+										<th colspan="4">Total Terjual</td>
+										<th>Rp.<?php echo number_format($bayar);?>,-</td>
+										<th colspan="2" style="background:#ddd"></th>
+										<th>Rp.<?php echo number_format($totalsemua);?>,-</td>
+										<th colspan="5" style="background:#ddd"></th>
 									</tr>
 								</tfoot>
 							</table>
 						</div>
-						<?php }?>
+						<?php } ?>
 							<div class="clearfix" style="padding-top:5pc;"></div>
 					</div>
 				  </div>

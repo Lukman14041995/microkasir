@@ -1,290 +1,493 @@
  <!--sidebar end-->
-      
-      <!-- **********************************************************************************************************************************************************
+
+ <!-- **********************************************************************************************************************************************************
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
-      <!--main content start-->
-      <?php 
-		  $id = $_SESSION['kasir']['id_member'];
-		  $hasil = $lihat -> member_edit($id);
-      ?>
-<section id="main-content">
-	<section class="wrapper">
-		<div class="row">
-			<div class="col-lg-12 main-chart">
-				<h3>Keranjang Penjualan</h3>
-				<br>
-				<?php if(isset($_GET['success'])){?>
-				<div class="alert alert-success">
-					<p>Edit Data Berhasil !</p>
-				</div>
-				<?php }?>
-				<?php if(isset($_GET['remove'])){?>
-				<div class="alert alert-danger">
-					<p>Hapus Data Berhasil !</p>
-				</div>
-				<?php }?>
-				<div class="col-sm-4">
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h4><i class="fa fa-search"></i> Cari Barang</h4>
-						</div>
-						<div class="panel-body">
-							<input type="text" id="cari" class="form-control" autofocus name="cari" placeholder="Masukan : Kode / Nama Barang  [ENTER]">
-						</div>
-					</div>
-				</div>
-				<div class="col-sm-8">
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h4><i class="fa fa-list"></i> Hasil Pencarian</h4>
-						</div>
-						<div class="panel-body">
-							<div id="hasil_cari"></div>
-							<div id="tunggu"></div>				
-						</div>
-					</div>
-				</div>
-				<div class="col-sm-12">
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h4><i class="fa fa-shopping-cart"></i> KASIR
-							<a class="btn btn-danger pull-right" style="margin-top:-0.5pc;" href="fungsi/hapus/hapus.php?penjualan=jual">
-								<b>RESET KERANJANG</b></a>
-							</h4>
-						</div>
-						<div class="panel-body">
-							<div id="keranjang">
-								<table class="table table-bordered">
-									<?php
-										$format = $lihat -> jual_id();
-										$invoice = $lihat -> invoice_id();
-									?>
-									<tr>
-										<td>No. Invoice</td>
-										<td><input type="text" readonly="readonly" required value="<?php echo $invoice; ?>" class="form-control"  name="invoice[]"></td>
-									</tr>
-									<tr>
-										<td><b>Tanggal</b></td>
-										<td><input type="text" readonly="readonly" class="form-control" value="<?php echo date("j F Y, G:i");?>" name="tgl"></td>
-									</tr>
-								</table>
-								<table class="table table-bordered" id="example1">
-									<thead>
-										<tr>
-											<td> No</td>
-											<td> Nama Barang</td>
-											<td style="width:20%;"> Harga</td>
-											<td style="width:10%;"> Jumlah</td>
-											<td style="width:20%;"> Total</td>
-											<!-- <td> Kasir</td> -->
-											<td> Aksi</td>
-										</tr>
-									</thead>
-									<tbody>
-										<?php $total_bayar=0; $no=1; 
-										$hasil_penjualan = $lihat -> penjualan();?>
-										<?php foreach($hasil_penjualan  as $isi){;?>
-										<tr>
-											<td><?php echo $no;?></td>
-											<td><?php echo $isi['nama_barang'];?></td>
-											<td>Rp.<?php echo number_format ($isi['harga_jual']);?>,-</td>
-											<td>
-												<form method="POST" action="fungsi/edit/edit.php?jual=jual">
-													<input type="number" name="jumlah" value="<?php echo $isi['jumlah'];?>" class="form-control">
-													<input type="hidden" name="id" value="<?php echo $isi['id_penjualan'];?>" class="form-control">
-													<input type="hidden" name="id_barang" value="<?php echo $isi['id_barang'];?>" class="form-control">
-											</td>
-											<td>Rp.<?php echo number_format($isi['total']);?>,-</td>
-											<!-- <td><?php echo $isi['nm_member'];?></td> -->
-											<td>
-													<!-- <button type="submit" class="btn btn-warning">Update</button> -->
-												</form>
-												<a href="fungsi/hapus/hapus.php?jual=jual&id=<?php echo $isi['id_penjualan'];?>&brg=<?php echo $isi['id_barang'];?>
-												&jml=<?php echo $isi['jumlah']; ?>"  class="btn btn-danger"><i class="fa fa-times"></i>
-												</a>
-											</td>
-										</tr>
-										<?php $no++; $total_bayar += $isi['total'];
-											$disc = $_POST['diskon'];
-											$diskon = $isi['total'] * $disc/100;
-											$totalakhir = $isi['total'] - $diskon;
-										}
-										?>
-									</tbody>
-									<tfoot>
-									<tr>
-										<th colspan="3">Total</td>
-										<th></td>
-										<th>Rp.<?php echo number_format ($total_bayar);?>,-</td>
-										<th colspan="2" style="background:#ddd"></th>
-									</tr>
-						</tfoot>
-							</table>
-							<br/>
-							<?php $hasil = $lihat -> jumlah(); ?>
-							<div id="kasirnya">
-								<table class="table table-stripped">
-									<?php
-										// proses bayar dan ke nota
-									
-									if(!empty($_GET['nota'] == 'yes')) {
-										$bayar = $_POST['pay'];
-										$kembali = $_POST['kembali'];
-										$id_barang = $_POST['id_barang'];
-										$id_member = $_POST['id_member'];
-										$invoice = $_POST['invoice'];
-										$jumlah = $_POST['jumlah'];
-										$total = $_POST['total'];
-										$tgl_input = $_POST['tgl_input'];
-										$periode = $_POST['periode'];
-										$jumlah_dipilih = count($id_barang);
-										
-										for($x=0;$x<$jumlah_dipilih;$x++){
+ <!--main content start-->
+ <?php
+	$id = $_SESSION['kasir']['id_member'];
+	$hasil = $lihat->member_edit($id);
+	?>
 
-											$d = array($id_barang[$x],$id_member[$x],$invoice[$x],$jumlah[$x],$total[$x],$tgl_input[$x],$periode[$x]);
-											$sql = "INSERT INTO nota (id_barang,id_member,invoice,jumlah,total,tanggal_input,periode) VALUES(?,?,?,?,?,?,?)";
-											$row = $config->prepare($sql);
-											$row->execute($d);
+ <?php
 
-											// ubah stok barang
-											$sql_barang = "SELECT * FROM barang WHERE id_barang = ?";
-											$row_barang = $config->prepare($sql_barang);
-											$row_barang->execute(array($id_barang[$x]));
-											$hsl = $row_barang->fetch();
-											
-											$stok = $hsl['stok'];
-											$idb  = $hsl['id_barang'];
+	require "konfig.php";
 
-											$total_stok = $stok - $jumlah[$x];
-											echo $total_stok;
-											$sql_stok = "UPDATE barang SET stok = ? WHERE id_barang = ?";
-											$row_stok = $config->prepare($sql_stok);
-											$row_stok->execute(array($total_stok, $idb));
-											
-										}
-										echo '<script>alert("Belanjaan Berhasil Di Bayar !");</script>';
-											// }else{
-											// 	echo '<script>alert("Uang Kurang ! Rp.'.$hitung.'");</script>';
-											// }
-										// }
-									}
-									
-									?>
-									<form method="POST" action="index.php?page=jual&nota=yes#kasirnya">
-									
-										<?php foreach($hasil_penjualan as $isi){;?>
-											<input type="hidden" name="id_barang[]" value="<?php echo $isi['id_barang'];?>">
-											<input type="hidden" name="id_member[]" value="<?php echo $isi['id_member'];?>">
-											<input type="hidden"  value="<?php echo $invoice; ?>" class="form-control"  name="invoice[]">
-											<input type="hidden" name="jumlah[]" value="<?php echo $isi['jumlah'];?>">
-											<input type="hidden" name="total[]" value="<?php echo $isi['total'];?>">
-											<input type="hidden" name="tgl_input[]" value="<?php echo $isi['tanggal_input'];?>">
-											<input type="hidden" name="periode[]" value="<?php echo  date("Y-m-d"); ?>">
-											<input type="hidden" name="id[]" value="<?php echo $isi['id_penjualan'];?>" class="form-control">
-										<?php } ?>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td><button type="submit" class="btn btn-success" ><i class="fa fa-shopping-cart"></i> Bayar</button></td>
-										<tr>
-									</form>
-									<form action="print.php" method="get" target="_blank">
-										<td>Diskon %</td>
-										<td width='10%'><input type="text" class="form-control" id='txtdisc' onkeyup="diskon();" name="disc"></td>
-										<td>Total Semua  </td>
-										<td><input type="text"  readonly="readonly" class="form-control"  id="txttotakhir" name="totalakhir"></td>
-										<td>Bayar  </td>
-										<td><input type="text"  required class="form-control" id="txtbayar" onkeyup="bayar();"  name="pay"></td>
-										<td>
-										<?php  if(!empty($_GET['nota'] == 'yes')) {?>
-											<a class="btn btn-danger" href="fungsi/hapus/hapus.php?penjualan=jual">
-											<b>RESET</b></a></td><?php }?></td>
-										</tr>
-									
-									<tr>
-										<td>Diskon Rp.</td>
-										<td width='10%'><input type="text" class="form-control" onkeyup="potongan()" id='txtrp'  name="potongan"></td>
-										<td>Kembali</td>
-										<td><input type="text" class="form-control" readonly name="kembali"  id="txtkembali"></td>
-										<?php $invoice = $lihat -> invoice_id(); ?>
-										<input type="hidden" name="totalbayar"  value="<?php echo $total_bayar ?>" id="">
-										<input type="hidden" name="member" value="<?php echo $_SESSION['kasir']['nm_member'];?>" id="">
-										<input type="hidden"  value="<?php echo $invoice; ?>" class="form-control"  name="invoice">
-										<td></td>
-										<td>
-											<button class="btn btn-default" type="submit" name="print">
-												<i class="fa fa-print"></i> Print Untuk Bukti Pembayaran
-											</button>
-										</td>
-									</form>
-									</tr>
-								</table>
-								<br/>
-								<br/>
+	$jumlah = $_POST['jumlahtotal'];
+	$id = $_POST['id'];
+	$idbarang = $_POST['id_barang'];
+
+	$query = mysqli_query($koneksi, "SELECT barang_name.harga_jual, barang.stok FROM barang_name INNER JOIN barang ON barang_name.id_barang = barang.id_barang WHERE barang_name.id_barang = '$idbarang' ");
+	$a = mysqli_fetch_array($query);
+	$harga_jual = $a['harga_jual'];
+	// if ($a['stok'] > $jumlah) {
+	$total = $harga_jual * $jumlah;
+	$update = mysqli_query($koneksi, "UPDATE penjualan SET jumlah = '$jumlah', total = '$total' WHERE id_penjualan = '$id'");
+	// }
+
+
+
+	?>
+
+
+ <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+ <style>
+ 	tr {
+ 		border-color: 1px solid rgb(196, 196, 196);
+ 	}
+ </style>
+ <div id="atas"></div>
+ <div class="card">
+ 	<div class="card-body">
+ 		<div class="row">
+ 			<div class="col-md-6">
+ 				<a href="index.php?page=barang" class="btn btn-success text-white">+ Tambah Stok</a>
+ 				<h3 class="mt-3">Keranjang Penjualan <i class="mdi mdi-cart"></i></h3>
+ 			</div>
+ 			<div class="col-md-6 text-right">
+ 				<?php $invoice = $lihat->invoice_id(); ?>
+ 				<h3>Invoice <?php echo $invoice ?> </h3>
+ 				<div class="row">
+ 					<div class="col-md-12 text-right">
+ 						<?php
+							$id_cabang = $_SESSION['kasir']['id_cabang'];
+							$query = "SELECT keranjang.*, barang_name.nama_barang,	 barang_name.harga_jual FROM keranjang INNER JOIN barang_name ON keranjang.id_barang = barang_name.id_barang
+				WHERE keranjang.id_cabang = '$id_cabang'";
+							?>
+ 						<a href="index.php?page=jual/hapus&id_cabang=<?= $id_cabang ?>" class="btn btn-danger" style="width: 200px; color: white;">Reset Keranjang</a>
+ 					</div>
+ 				</div>
+ 			</div>
+ 		</div>
+ 		<div class="row mt-3">
+ 			<div class="col-md-6">
+ 				<div class="row">
+ 					<div class="col-md-12">
+ 						<h5 class="text-right">Cari Barang <i class="fa fa-search"></i> </h5>
+ 					</div>
+ 				</div>
+ 				<div class="table-responsive">
+ 					<table class="table" id="editable-sample">
+ 						<thead>
+ 							<tr class="bg-dark">
+ 								<!--<th width="5%">No</th>-->
+ 								<th style="color: white;" width="20%">Id Barang</th>
+ 								<th style="color: white;" width="20%">Product</th>
+ 								<th style="color: white;" width="15%">Price</th>
+ 								<th style="color: white;" width="15%">Stock</th>
+ 								<!--<th>Deskripsi</th>-->
+ 								<th style="color: white;" width="10%">Action</th>
+ 							</tr>
+ 						</thead>
+ 						<tbody>
+ 							<?php
+								$id = $_SESSION['kasir']['id_cabang'];
+								$no = 1;
+								$queryProduct = mysqli_query($koneksi, "SELECT barang.*, barang_name.nama_barang, barang_name.harga_jual, kategori.nama_kategori FROM barang INNER JOIN barang_name ON barang.id_barang = barang_name.id_barang INNER JOIN kategori ON barang_name.id_kategori = kategori.id_kategori WHERE barang.id_cabang = '$id'
+						ORDER BY id_barang asc ");
+								while ($rowProduct = mysqli_fetch_array($queryProduct)) {
+								?>
+ 								<tr class="">
+ 									<!-- <td><?php echo $no++ ?></td>-->
+ 									<td><?php echo $rowProduct['id_barang'] ?></td>
+ 									<td><?php echo $rowProduct['nama_barang'] ?></td>
+ 									<td>Rp. <?php echo number_format($rowProduct['harga_jual'], 0, ',', '.'); ?></td>
+ 									<td><?php if ($rowProduct['stok'] == '0') { ?>
+ 											<span class="badge badge-danger"> Habis</span>
+ 										<?php } else { ?>
+ 											<?php echo $rowProduct['stok']; ?>
+ 										<?php } ?>
+ 									</td>
+ 									<!-- <td><?php echo $rowProduct[''] ?></td>-->
+ 									<td>
+ 										<a href="index.php?page=jual/cart&input=add&id_barang=<?= $rowProduct['id_barang'] ?>">
+ 											<button class="btn btn-primary" type="submit">
+ 												Select
+ 											</button>
+ 										</a>
+ 										<!-- <a href="?hal=master/barang/list&hapus=<?php echo $rowProduct['id']; ?>">
+								<button class="btn btn-danger" type="submit" name="hapus"><i
+												class="fa fa-trash-o"></i> Delete
+									</button>
+								</a> -->
+ 									</td>
+ 								</tr>
+ 								<!--
+						<tr class="">
+							<td><img src="assets/images/product/<?php echo $rowProduct['product_images']; ?>"
+									width="100%"></td>
+							<td><?php echo $rowProduct['product_name'] ?></td>
+							<td>Rp. <?php echo number_format($rowProduct['product_price'], 0, ',', '.'); ?></td>
+							<td><?php echo $rowProduct['product_stock'] ?></td>
+							<td><?php echo $rowProduct['product_desc'] ?></td>
+							<td>
+								<a href="?hal=master/product/edit&id=<?php echo $rowProduct['product_id']; ?>">
+									<button class="btn btn-primary" type="submit"><i class="fa fa-edit"
+																					aria-hidden="true"></i>
+										Edit
+									</button>
+								</a>
+								<a href="?hal=master/product/list&hapus=<?php echo $rowProduct['product_id']; ?>">
+								<button class="btn btn-danger" type="submit" name="hapus"><i
+												class="fa fa-trash-o"></i> Delete
+									</button>
+								</a>
+							</td>
+						</tr>-->
+ 							<?php } ?>
+ 						</tbody>
+ 					</table>
+ 				</div>
+ 			</div>
+ 			<div class="col-md-6">
+ 				<div class="table-responsive">
+ 					<table id="editable-sample" class="table">
+ 						<thead>
+ 							<tr class="bg-dark">
+ 								<th></th>
+ 								<th style="color: white;">Item</th>
+ 								<th style="color: white;">Price</th>
+ 								<th style="color: white;">Qty</th>
+ 								<th style="color: white; ">Disc</th>
+ 								<th style="color: white;">Total</th>
+ 								<th></th>
+ 							</tr>
+ 						</thead>
+ 						<tbody>
+ 							<?php
+								$id_cabang = $_SESSION['kasir']['id_cabang'];
+								$idbarang = $_GET['id_barang'];
+								$query = "SELECT keranjang.*, barang_name.nama_barang, barang_name.disc, barang_name.harga_jual FROM keranjang INNER JOIN barang_name ON keranjang.id_barang = barang_name.id_barang
+				WHERE keranjang.id_cabang = '$id_cabang'  ";
+
+								$result = mysqli_query($koneksi, $query);
+								$no = 1;
+								$total = 0;
+
+								while ($data = mysqli_fetch_array($result)) {
+									$sub_total = +$data['harga_jual'] * $data['stok'];
+
+									$rumus = $sub_total * $data['disc'] / 100;
+									$diskon = $sub_total - $rumus;
+									$total += $diskon;
+								?>
+ 								<tr>
+ 									<td>
+ 										<a href="index.php?page=jual/hapus_keranjang&hapus=<?= $data['id_keranjang'] ?>&id_cabang=<?= $id_cabang ?>"><i
+ 												class="fa fa-times" style="color: red"></i></a>
+ 									</td>
+ 									<td>
+ 										<?php echo $data['nama_barang'] ?></td>
+ 									<td><?php echo number_format($data['harga_jual'], 0, ',', '.'); ?></td>
+ 									<td>
+ 										<form action="index.php?page=jual/cart" method="post">
+ 											<input type="text" name="qty" value="<?php echo $data['stok'] ?>" style="width: 35px; border: none;" id="">
+ 											<input type="hidden" name="idbarang" value="<?php echo $data['id_barang'] ?>" style="width: 35px; border: none;" id="">
+ 										</form>
+ 										<!-- <a href="index.php?page=jual/cart&tambah=tambah&id_barang=<?php echo $data['id_barang'] ?>"><button style="border: none;" type="submit" class="badge badge-info"><i class="fas fa-angle-right"></i></button></a> -->
+ 									</td>
+ 									<td><?php echo $data['disc'] ?>%</td>
+ 									<td>Rp. <?php echo number_format($diskon, 0, ',', '.'); ?></td>
+ 									<td><a href="index.php?page=jual/cart&kurang=add&id_barang=<?php echo $data['id_barang'] ?>"><button style="border: none;" type="submit" class="badge badge-danger">-</button></a>
+ 									</td>
+ 								</tr>
+ 							<?php } ?>
+ 							<tr>
+ 								<form action="print.php" method="GET" target="_blank">
+ 									<td colspan="5">
+ 										Sub Total
+ 									</td>
+ 									<td>
+ 										Rp. <?php echo number_format($total, 0, ',', '.'); ?>
+ 										<?php
+											require "konfig.php";
+											$idmember = $_SESSION['kasir']['id_member'];
+											$idcabang = $_SESSION['kasir']['id_cabang'];
+											$nm_member = $_SESSION['kasir']['nm_member'];
+											$scl = mysqli_query($koneksi, "SELECT * FROM keranjang WHERE id_member = '$idmember' and id_cabang = '$idcabang'");
+											while ($q = mysqli_fetch_array($scl)) {
+												$id_barang = $q['id_barang'];
+												$stok = $q['stok'];
+											?>
+ 											<input type="hidden" name="idbarang[]" value="<?php echo $id_barang ?>">
+ 											<input type="hidden" name="stok[]" value="<?php echo $stok ?>">
+ 											<input type="hidden" name="subtot[]" value="<?php echo $diskon ?>">
+ 											<input type="hidden" name="tgl_input[]" value="<?php echo date("j F Y, G:i") ?>">
+ 											<input type="hidden" name="periode[]" value="<?php echo date('Y-m-d') ?>">
+ 											<input type="hidden" name="idmember[]" value="<?php echo $idmember ?>">
+ 											<input type="hidden" value="<?php echo $invoice ?>" name="invoice[]">
+ 										<?php }
+											?>
+ 										<input type="hidden" name="cabang" value="<?php echo $idcabang ?>">
+
+ 										<input type="hidden" name="nmmember" value="<?php echo $nm_member ?>">
+ 										<input type="hidden" value="<?php echo $invoice ?>" name="invo">
+ 									</td>
+ 							</tr>
+ 							<tr>
+ 								<td colspan="3"><input type="text" class="form-control" placeholder="Diskon(%)" onkeyup="diskon()" name="disc" id="txtdisc"></td>
+ 								<td colspan="3"><input type="text" class="form-control" placeholder="Potongan(Rp.)" name="pot" onkeyup="diskon()" id="potongan"></td>
+ 							</tr>
+ 							<tr>
+ 								<td>Total</td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td><input type="text" onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);" value="<?php echo $total ?>" readonly class="form-control" name="bigtotal" id="type1"></td>
+ 							</tr>
+ 							<tr>
+ 								<td>Bayars</td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td><input type="text" class="form-control input-lg" placeholder="input payment"
+ 										id="type2" autofocus required oninvalid="this.setCustomValidity('Bayarnya Belum :D')"
+ 										onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);" />
+
+ 									<input type="hidden" class="form-control input-lg" placeholder="input payment"
+ 										id="type2" name="cash" autofocus required oninvalid="this.setCustomValidity('Bayarnya Belum :D')"
+ 										onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);" />
+ 								</td>
+ 							</tr>
+ 							<tr>
+ 								<td>Kembalian</td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td></td>
+ 								<td>
+ 									<input type="hidden" name="kembalian" id="kembalian">
+ 									<input type="text" id="result" style="border: none; color: white; background-color: orangered; padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+ 									<!-- <input type="text" name="" id="result" class="form-control"> -->
+ 									<!-- <p>
+						<span class="bg-danger text-white p-3 p-md-3" id="result">
+						</span></p> -->
+ 							</tr>
+ 							<tr>
+ 								<td colspan="6" align="reight">
+
+ 									<button class="btn btn-danger btn-lg btn-block" type="submit" name="bayar" style="color: white;">Payment
+ 									</button>
+ 								</td>
+ 								</form>
+
+ 								<!-- <div class="modal fade rounded" id="myModal" tabindex="-1" role="dialog"
+						aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog p-3 p-md-3">
+							<div class="modal-content bg-dark text-white p-3 p-md-3">
+							<h3 class="text-center text-white p-3 p-md-5">TRANSACTION</h3>
+								<div class="modal-header bg-dark text-white">
+								
+									<h2 class="modal-title text-white">TOTAL :
+										Rp. <?php echo number_format($total, 0, ',', '.'); ?></h2>
+								</div>
+
+								<div class="modal-body row">
+									<div class="col-sm-12 p-3 p-md-3"> -->
+ 								<!--<form method="POST" action="?hal=cetak">-->
+ 								<!-- <form method="POST" action="cetak.php">
+											<div class="form-group">
+												<label><h3 class="text-white"> PAYMENT</h3></label>
+
+											</div>
+
+
+											<div class="form-group"> -->
+ 								<!-- <input type="hidden" id="type1" name="grand_total"
+													onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);"
+													value="<?php echo number_format($total, 0, ',', '.'); ?>"/> -->
+
+ 								<!-- <input type="text" class="form-control input-lg" placeholder="input payment"
+													id="type2" name="cash"
+													onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);"
+													/> -->
+
+ 								<!-- 
+											</div>
+
+											<div class="form-group">
+
+												<label><h3 class="text-white">CHANGE</h3></label> -->
+ 								<!-- <input type="hidden" name="kembalian"
+													id="kembalian">
+												<h1>
+
+											<span class="bg-danger text-white p-3 p-md-3" id="result">
+											</span></h1> -->
+ 								<!-- </div>
+
+											<div class="pull-right">
+
+												<button class="btn btn-info btn-sm"
+														type="submit">SAVE / PRINT
+												</button>
+												<button class="btn btn-danger btn-sm"
+														data-dismiss="modal" aria-hidden="true"
+														type="button">
+													Cancel
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-</section>
-	
-
-<script>
-// AJAX call for autocomplete 
-$(document).ready(function(){
-	$("#cari").change(function(){
-		$.ajax({
-		type: "POST",
-		url: "fungsi/edit/edit.php?cari_barang=yes",
-		data:'keyword='+$(this).val(),
-		beforeSend: function(){
-            $("#hasil_cari").hide();
-			$("#tunggu").html('<p style="color:green"><blink>tunggu sebentar</blink></p>');
-		},
-          success: function(html){
-			$("#tunggu").html('');
-            $("#hasil_cari").show();
-            $("#hasil_cari").html(html);
-		}
-	});
-	});
-});
-//To select country name
-</script>
-
-<script>
-	function diskon(){
-		var txtdisc = document.getElementById('txtdisc').value;
-		var txtbayar = document.getElementById('txtbayar').value;
-		var diskon = <?php echo $total_bayar ?> * txtdisc/100;
-		var totalakhir = <?php echo $total_bayar ?> - diskon;
-		 if (!isNaN(totalakhir)) {
-			document.getElementById('txttotakhir').value = totalakhir ;
-		}
-	}
-	function potongan(){
-		var disrp = document.getElementById('txtrp').value;
-		var totakhir = <?php echo $total_bayar ?> - disrp;
-		if(!isNaN(totakhir)){
-			document.getElementById('txttotakhir').value = totakhir ;
-		}
-	}
-	function bayar(){
-		var bayar = document.getElementById('txtbayar').value;
-		var akhir = document.getElementById('txttotakhir').value;
-		var kembali = bayar - akhir;	
-		if (!isNaN(kembali)) {
-			document.getElementById('txtkembali').value = kembali;
-		}
-	}
-</script>
+					</div> -->
+ 								<!-- end modal -->
+ 							</tr>
+ 						</tbody>
+ 					</table>
+ 				</div>
+ 			</div>
+ 		</div>
+ 	</div>
+ </div>
 
 
 
+ <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+ <script>
+ 	// AJAX call for autocomplete 
+ 	$(document).ready(function() {
+ 		$("#cari").change(function() {
+ 			$.ajax({
+ 				type: "POST",
+ 				url: "fungsi/edit/edit.php?cari_barang=yes",
+ 				data: 'keyword=' + $(this).val(),
+ 				beforeSend: function() {
+ 					$("#hasil_cari").hide();
+ 					$("#tunggu").html('<p style="color:green"><blink>tunggu sebentar</blink></p>');
+ 				},
+ 				success: function(html) {
+ 					$("#tunggu").html('');
+ 					$("#hasil_cari").show();
+ 					$("#hasil_cari").html(html);
+ 				}
+ 			});
+ 		});
+ 	});
+ 	//To select country name
+ </script>
+ <script>
+ 	document.getElementById('type2').addEventListener('input', function(e) {
+ 		// Ambil nilai input tanpa karakter non-angka
+ 		let input = e.target.value.replace(/[^,\d]/g, '');
 
+ 		// Format nilai menjadi Rupiah
+ 		let formatted = new Intl.NumberFormat('id-ID', {
+ 			style: 'currency',
+ 			currency: 'IDR',
+ 			minimumFractionDigits: 0
+ 		}).format(input.replace(/\D/g, ''));
+
+ 		// Tampilkan nilai yang sudah diformat ke dalam input field
+ 		e.target.value = formatted.replace(/^Rp/, '').trim(); // Hilangkan "Rp" jika ingin tanpa simbol
+ 	});
+ </script>
+
+ <script>
+ 	function diskon() {
+ 		var txtdisc = document.getElementById('txtdisc').value;
+ 		var disrp = document.getElementById('potongan').value;
+ 		var diskon = <?php echo $total ?> * txtdisc / 100;
+ 		var totalakhir = <?php echo $total ?> - diskon - disrp;
+ 		if (!isNaN(totalakhir)) {
+ 			document.getElementById('type1').value = totalakhir;
+ 		}
+ 	}
+
+ 	function bayar() {
+ 		var bayar = document.getElementById('txtbayar').value;
+ 		var akhir = document.getElementById('txttotakhir').value;
+ 		var kembali = bayar - akhir;
+ 		if (!isNaN(kembali)) {
+ 			document.getElementById('txtkembali').value = kembali;
+ 		}
+ 	}
+
+ 	function bayar() {
+ 		var bayar = document.getElementById('txtbayar').value;
+ 		var akhir = document.getElementById('txttotakhir').value;
+ 		var kembali = bayar - akhir;
+ 		// if (akhir == null || txtdisc == null || disrp == null) {
+ 		//     document.getElementById('txtkembali').value = '';
+ 		// }else
+ 		if (!isNaN(kembali)) {
+ 			document.getElementById('txtkembali').value = kembali;
+ 		}
+ 	}
+ </script>
+ <script>
+ 	$('#editable-sample').DataTable();
+ </script>
+ <script>
+ 	function searchFilter(page_num) {
+ 		// page_num = page_num?page_num:0;
+ 		var keywords = $('#keywords').val();
+ 		// var sortBy = $('#sortBy').val();
+ 		$.ajax({
+ 			type: 'GET',
+ 			url: 'getProduct.php',
+ 			data: '?hal=post&keywords=' + keywords,
+ 			beforeSend: function() {
+ 				$('.loading-overlay').show();
+ 			},
+ 			success: function(html) {
+ 				$('#show_product').html(html);
+ 				$('.loading-overlay').fadeOut("slow");
+ 			}
+ 		});
+ 	}
+
+ 	function formatRupiah(angka, prefix) {
+ 		var number_string = angka.replace(/[^,\d]/g, '').toString(),
+ 			split = number_string.split(','),
+ 			sisa = split[0].length % 3,
+ 			rupiah = split[0].substr(0, sisa),
+ 			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+ 		if (ribuan) {
+ 			separator = sisa ? '.' : '';
+ 			rupiah += separator + ribuan.join('.');
+ 		}
+
+ 		rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+ 		return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+ 	}
+
+ 	function convertToRupiah(angka) {
+ 		var rupiah = '';
+ 		var angkarev = angka.toString().split('').reverse().join('');
+ 		for (var i = 0; i < angkarev.length; i++)
+ 			if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + '.';
+ 		return 'Rp. ' + rupiah.split('', rupiah.length - 1).reverse().join('');
+ 	}
+
+ 	function kalkulatorTambah(type1, type2) {
+
+ 		var a = parseInt(type1.replace(/,.*|[^0-9]/g, ''), 10); //eval(type1);
+ 		var b = parseInt(type2.replace(/,.*|[^0-9]/g, ''), 10);
+ 		var hasil = b - a;
+
+ 		var jumlah = 'Rp. ' + hasil.toFixed(0).replace(/(d)(?=(ddd)+(?!d))/g, "$1.");
+ 		//var total = NilaiRupiah(hasil);
+ 		// console.info('hahah')
+ 		document.getElementById('result').value = convertToRupiah(hasil);
+
+ 		document.getElementById("kembalian").value = hasil; //document.getElementById("type2").value;
+
+ 	}
+
+ 	/* Tanpa Rupiah */
+ 	var tanpa_rupiah = document.getElementById('type1');
+ 	tanpa_rupiah.addEventListener('keyup', function(e) {
+ 		tanpa_rupiah.value = formatRupiah(this.value);
+ 	});
+
+ 	// var puser = document.getElementById('type2');
+ 	// puser.addEventListener('keyup', function (e) {
+ 	//     puser.value = formatRupiah(this.value);
+ 	// });
+ </script>

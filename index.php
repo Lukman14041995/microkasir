@@ -1,3 +1,6 @@
+<html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.all.min.js"></script>
+</html>
 <?php 
 	@ob_start();
 	session_start();
@@ -25,7 +28,7 @@
 			$toko = $lihat -> toko();
 			// kasir
 				include 'kasir/template/header.php';
-				include 'kasir/template/sidebar.php';
+				// include 'kasir/template/sidebar.php';
 					if (!empty($_GET['page'])) {
 						include 'kasir/module/'.$_GET['page'].'/index.php';
 					}else {
@@ -49,9 +52,14 @@
 					include 'users/template/footer.php';
 			// end superuser
 		}else{
-			echo "<script>
-			alert('User ID dan Password tidak cocok');
-			window.location='login.php';</script>";
+			echo "<script>Swal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: 'Username & Password tidak cocok',
+			  });
+			  window.setTimeout(function(){ 
+			  window.location.replace('login.php');
+			  } ,2000);</script>";
 		}
 ?>
 

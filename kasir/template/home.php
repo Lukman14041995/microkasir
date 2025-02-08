@@ -4,168 +4,471 @@
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
       <!--main content start-->
-      <section id="main-content">
-          <section class="wrapper">
+      <?php 
+		  $id = $_SESSION['kasir']['id_member'];
+		  $hasil = $lihat -> member_edit($id);
+      ?>
+	  
+<?php 
 
-              <div class="row">
-                  <div class="col-lg-9">
-					<div class="row" style="margin-left:1pc;margin-right:1pc;">
-				  <h1>DASHBOARD</h1>
-				  <hr>
-				   
-				  <?php 
-						$sql=" select * from barang where stok <= 3";
-						$row = $config -> prepare($sql);
-						$row -> execute();
-						$r = $row -> fetchAll();
-						foreach($r as $q){
-					?>	
-					<?php
-							echo "
-							<div class='alert alert-warning'>
-								<span class='glyphicon glyphicon-info-sign'></span> Stok  <a style='color:red'>". $q['nama_barang']."</a>  / <span style='color:red'> ID ". $q['id_barang']."</span> yang tersisa sudah kurang dari 3 . silahkan pesan lagi !!
-								<span class='pull-right'><a href='index.php?page=barang'>Tabel Barang <i class='fa fa-angle-double-right'></i></a></span>
-							</div>
-							";	
-						}
-					?>
+require "konfig.php";
 
-				  <?php 
-						$sql="SELECT * FROM barang WHERE tgl_expired <= now()";
-						$row = $config -> prepare($sql);
-						$row -> execute();
-						$r = $row -> fetchAll();
-						foreach($r as $q){
-					?>	
-				  <?php
-						echo "
-						<div class='alert alert-warning'>
-							<span class='glyphicon glyphicon-info-sign'></span> Stok  <a style='color:red'>". $q['nama_barang']."</a>  / <span style='color:red'> ID ". $q['id_barang']."</span> Kadaluarsa .  !! Pada tanggal <a style='color:red'>". $q['tgl_expired'] ."</a>
-							<span class='pull-right'><a href=''>OK</a></span>
-						</div>
-						";	
-					}
-				  ?>
+	$jumlah = $_POST['jumlahtotal'];
+	$id = $_POST['id'];
+	$idbarang = $_POST['id_barang'];
+
+	$query = mysqli_query($koneksi, "SELECT barang_name.harga_jual, barang.stok FROM barang_name INNER JOIN barang ON barang_name.id_barang = barang.id_barang WHERE barang_name.id_barang = '$idbarang' ");
+	$a = mysqli_fetch_array($query);
+	$harga_jual = $a['harga_jual'];
+	// if ($a['stok'] > $jumlah) {
+		$total = $harga_jual * $jumlah;
+		$update = mysqli_query($koneksi, "UPDATE penjualan SET jumlah = '$jumlah', total = '$total' WHERE id_penjualan = '$id'");
+	// }
+	
 
 
+?>
 
-
-
-
-				  <?php $hasil_barang = $lihat -> barang_row();?>
-				  <?php $hasil_kategori = $lihat -> kategori_row();?>
-				  <?php $stok = $lihat -> barang_stok_row();?>
-				  <?php $jual = $lihat -> jual_row();?>
-				  <?php $total = $lihat -> total_row();?>
-				  <?php $nota = $lihat -> jumlah_nota(); ?>
-				  <?php $pengeluaran = $lihat -> jml_pengeluaran(); ?>
-                    <div class="row">
-                      <!--STATUS PANELS -->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-primary">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Nama Barang</h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h1><?php echo $hasil_barang;?></h1></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;"><a href='index.php?page=barang'>Tabel Barang <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-                      <!-- STATUS PANELS -->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-success">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Stok Barang</h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h1><?php echo $stok['jml'];?></h1></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;"><a href='index.php?page=barang'>Tabel Barang  <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-                      <!-- STATUS PANELS -->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-info">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Telah Terjual</h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h1><?php echo $jual['stok'];?></h1></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;font-weight:700;"><a href='index.php?page=laporan'>Tabel laporan  <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-danger">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Kategori Barang</h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h1><?php echo $hasil_kategori;?></h1></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;"><a href='index.php?page=kategori'>Tabel Kategori  <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-info">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Total Pengeluaran </h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h3>Rp.<?php echo number_format($pengeluaran['pay']);?>,-</h3></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;"><a href='index.php?page=pengeluaran'>Tabel Pengeluaran  <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-                      	<div class="col-md-3">
-                      		<div class="panel panel-warning">
-                      			<div class="panel-heading">
-						  			<h5><i class="fa fa-desktop"></i> Total Penghasilan </h5>
-                      			</div>
-                      			<div class="panel-body">
-									<center><h3>Rp.<?php echo number_format($nota['bayar']);?>,-</h3></center>
-								</div>
-								<div class="panel-footer">
-									<h4 style="font-size:15px;font-weight:700;"><a href='index.php?page=laporan'>Tabel Penghasilan  <i class='fa fa-angle-double-right'></i></a></h4>
-								</div>
-	                      	</div><!--/grey-panel -->
-                      	</div><!-- /col-md-3-->
-						  
-					</div>
+ 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+<style>
+	tr{
+	border-color: 1px solid rgb(196, 196, 196);
+	}
+</style>
+<div id="atas"></div>
+<div class="card">
+  <div class="card-body">
+	<div class="row">
+		<div class="col-md-6">
+			<a href="index.php?page=barang" class="btn btn-success text-white">+ Tambah Stok</a>
+			<h3  class="mt-3">Keranjang Penjualan <i class="mdi mdi-cart"></i></h3>
+		</div>
+		<div class="col-md-6 text-right">
+		<?php $invoice = $lihat -> invoice_id(); ?>
+			<h3>Invoice <?php echo $invoice ?> </h3>
+			<div class="row">
+				<div class="col-md-12 text-right">
+				<?php
+				$id_cabang = $_SESSION['kasir']['id_cabang'];
+				$query = "SELECT keranjang.*, barang_name.nama_barang,	 barang_name.harga_jual FROM keranjang INNER JOIN barang_name ON keranjang.id_barang = barang_name.id_barang
+				WHERE keranjang.id_cabang = '$id_cabang'";
+				?>
+				<a href="index.php?page=jual/hapus&id_cabang=<?=$id_cabang ?>" class="btn btn-danger" style="width: 200px; color: white;">Reset Keranjang</a>
 				</div>
-           </div><!-- /col-lg-9 END SECTION MIDDLE -->
-                  
-      <!-- **********************************************************************************************************************************************************
-      RIGHT SIDEBAR CONTENT
-      *********************************************************************************************************************************************************** -->                  
-                  
-			<div class="col-lg-3 ds">
-				<div id="calendar" class="mb">
-					<div class="panel green-panel no-margin">
-						<div class="panel-body">
-							<div id="date-popover" class="popover top" style="cursor: pointer; disadding: block; margin-left: 33%; margin-top: -50px; width: 175px;">
-								<div class="arrow"></div>
-								<h3 class="popover-title" style="disadding: none;"></h3>
-								<div id="date-popover-content" class="popover-content"></div>
-							</div>
-							<div id="my-calendar"></div>
-						</div>
-					</div>
-				</div><!-- / calendar -->
-			  </div><!-- /col-lg-3 -->
-		  </div><! --/row -->
-		 <div class="clearfix" style="padding-top:18%;"></div>
-	  </section>
-  </section>
+			</div>
+		</div>
+	</div>
+  	<div class="row mt-3">
+		<div class="col-md-6">
+			<div class="row">
+				<div class="col-md-12">
+					<h5 class="text-right">Cari Barang <i class="fa fa-search"></i> </h5>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table" id="editable-sample">
+					<thead>
+					<tr class="bg-dark">
+						<!--<th width="5%">No</th>-->
+						<th style="color: white;" width="20%">Id Barang</th>
+						<th style="color: white;" width="20%">Product</th>
+						<th style="color: white;" width="15%">Price</th>
+						<th style="color: white;" width="15%">Stock</th>
+						<!--<th>Deskripsi</th>-->
+						<th style="color: white;" width="10%">Action</th>
+					</tr>
+					</thead>
+					<tbody>
+					<?php
+						$id = $_SESSION['kasir']['id_cabang'];
+						$no = 1;
+						$queryProduct = mysqli_query($koneksi, "SELECT barang.*, barang_name.nama_barang, barang_name.harga_jual, kategori.nama_kategori FROM barang INNER JOIN barang_name ON barang.id_barang = barang_name.id_barang INNER JOIN kategori ON barang_name.id_kategori = kategori.id_kategori WHERE barang.id_cabang = '$id'
+						ORDER BY id_barang asc ");
+						while ($rowProduct = mysqli_fetch_array($queryProduct)) {
+					?>
+						<tr class="">
+						<!-- <td><?php echo $no++ ?></td>-->
+							<td><?php echo $rowProduct['id_barang'] ?></td>
+							<td><?php echo $rowProduct['nama_barang'] ?></td>
+							<td>Rp. <?php echo number_format($rowProduct['harga_jual'], 0, ',', '.'); ?></td>
+							<td><?php if($rowProduct['stok'] == '0'){?>
+								<span class="badge badge-danger"> Habis</span>
+							<?php }else{?>
+								<?php echo $rowProduct['stok'];?>
+							<?php }?></td>
+						<!-- <td><?php echo $rowProduct[''] ?></td>-->
+							<td>
+								<a href="index.php?page=jual/cart&input=add&id_barang=<?=$rowProduct['id_barang']?>">
+									<button class="btn btn-primary" type="submit">
+										Select
+									</button>
+								</a>
+								<!-- <a href="?hal=master/barang/list&hapus=<?php echo $rowProduct['id']; ?>">
+								<button class="btn btn-danger" type="submit" name="hapus"><i
+												class="fa fa-trash-o"></i> Delete
+									</button>
+								</a> -->
+							</td>
+						</tr>
+						<!--
+						<tr class="">
+							<td><img src="assets/images/product/<?php echo $rowProduct['product_images']; ?>"
+									width="100%"></td>
+							<td><?php echo $rowProduct['product_name'] ?></td>
+							<td>Rp. <?php echo number_format($rowProduct['product_price'], 0, ',', '.'); ?></td>
+							<td><?php echo $rowProduct['product_stock'] ?></td>
+							<td><?php echo $rowProduct['product_desc'] ?></td>
+							<td>
+								<a href="?hal=master/product/edit&id=<?php echo $rowProduct['product_id']; ?>">
+									<button class="btn btn-primary" type="submit"><i class="fa fa-edit"
+																					aria-hidden="true"></i>
+										Edit
+									</button>
+								</a>
+								<a href="?hal=master/product/list&hapus=<?php echo $rowProduct['product_id']; ?>">
+								<button class="btn btn-danger" type="submit" name="hapus"><i
+												class="fa fa-trash-o"></i> Delete
+									</button>
+								</a>
+							</td>
+						</tr>-->
+					<?php } ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="table-responsive">
+				<table id="editable-sample" class="table">
+				<thead>
+				<tr class="bg-dark">
+					<th></th>
+					<th style="color: white;">Item</th>
+					<th style="color: white;">Price</th>
+					<th style="color: white;">Qty</th>
+					<th style="color: white; " >Disc</th>
+					<th style="color: white;">Total</th>
+					<th></th>
+				</tr>
+				</thead>
+				<tbody>
+				<?php
+				$id_cabang = $_SESSION['kasir']['id_cabang'];
+				$idbarang = $_GET['id_barang'];
+				$query = "SELECT keranjang.*, barang_name.nama_barang, barang_name.disc, barang_name.harga_jual FROM keranjang INNER JOIN barang_name ON keranjang.id_barang = barang_name.id_barang
+				WHERE keranjang.id_cabang = '$id_cabang'  ";
 
+				$result = mysqli_query($koneksi, $query);
+				$no = 1;
+				$total = 0;
+
+				while ($data = mysqli_fetch_array($result)) {
+					$sub_total = +$data['harga_jual'] * $data['stok'];
+
+					$rumus = $sub_total * $data['disc']/100;
+					$diskon = $sub_total - $rumus;
+					$total += $diskon;
+					?>
+					<tr>
+						<td>
+							<a href="index.php?page=jual/hapus_keranjang&hapus=<?=$data['id_keranjang']?>&id_cabang=<?=$id_cabang ?>"><i
+							class="fa fa-times" style="color: red"></i></a>
+						</td>
+						<td>
+							<?php echo $data['nama_barang'] ?></td>
+						<td><?php echo number_format($data['harga_jual'], 0, ',', '.'); ?></td>
+						<td>
+						 <form action="index.php?page=jual/cart" method="post">
+						 <input type="text" name="qty" value="<?php echo $data['stok'] ?>" style="width: 35px; border: none;" id="">
+						 <input type="hidden" name="idbarang" value="<?php echo $data['id_barang'] ?>" style="width: 35px; border: none;" id="">
+						 </form>
+						 <!-- <a href="index.php?page=jual/cart&tambah=tambah&id_barang=<?php echo $data['id_barang']?>"><button style="border: none;" type="submit" class="badge badge-info"><i class="fas fa-angle-right"></i></button></a> -->
+						 </td>
+						 <td><?php echo $data['disc'] ?>%</td>
+						<td>Rp. <?php echo number_format($diskon, 0, ',', '.'); ?></td>
+						<td><a href="index.php?page=jual/cart&kurang=add&id_barang=<?php echo $data['id_barang']?>"><button style="border: none;" type="submit" class="badge badge-danger">-</button></a>
+						</td>
+					</tr>
+				<?php } ?>
+				<tr>
+			 <form action="print.php" method="GET" target="_blank">
+					<td colspan="5">
+						Sub Total
+					</td>
+					<td>
+						Rp. <?php echo number_format($total, 0, ',', '.'); ?>
+						<?php 
+						require "konfig.php";
+						$idmember = $_SESSION['kasir']['id_member'];
+						$idcabang = $_SESSION['kasir']['id_cabang'];
+						$nm_member = $_SESSION['kasir']['nm_member'];
+						// $scl = mysqli_query($koneksi, "SELECT * FROM keranjang WHERE id_member = '$idmember' and id_cabang = '$idcabang'");
+						$scl = mysqli_query($koneksi,"SELECT keranjang.*, barang_name.disc FROM keranjang INNER JOIN barang_name ON keranjang.id_barang = barang_name.id_barang WHERE id_member = '$idmember' and id_cabang = '$idcabang'");
+						while ($q = mysqli_fetch_array($scl)) {
+							$id_barang = $q['id_barang'];
+							$stok = $q['stok'];
+							?>
+							<input type="hidden" name="idbarang[]" value="<?php echo $id_barang ?>">
+							<input type="hidden" name="stok[]" value="<?php echo $stok ?>">
+							<input type="hidden" name="subtot[]" value="<?php echo $sub_total ?>">
+							<input type="hidden" name="discon[]" value="<?php echo $q['disc'] ?>">
+							<input type="hidden" name="tgl_input[]" value="<?php echo date("j F Y, G:i") ?>">
+							<input type="hidden" name="periode[]" value="<?php echo date('Y-m-d') ?>">
+							<input type="hidden" name="idmember[]" value="<?php echo $idmember ?>">
+							<input type="hidden" value="<?php echo $invoice ?>" name="invoice[]">
+						<?php }
+						?>
+						<input type="hidden" name="cabang" value="<?php echo $idcabang ?>">
+
+						<input type="hidden" name="nmmember" value="<?php echo $nm_member ?>">
+						<input type="hidden" value="<?php echo $invoice ?>" name="invo">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3"><input type="text" class="form-control" placeholder="Diskon(%)" onkeyup="diskon()" name="disc" id="txtdisc"></td>
+					<td colspan="3"><input type="text" class="form-control" placeholder="Potongan(Rp.)" name="pot" onkeyup="diskon()" id="potongan"></td>
+				</tr>
+				<tr>
+					<td>Total</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><input type="text" onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);" value="<?php echo $total ?>" readonly class="form-control" name="bigtotal" id="type1"></td>
+				</tr>
+				<tr>
+					<td>Bayar</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><input type="text" class="form-control input-lg" placeholder="input payment"
+						id="type2" name="cash" autofocus required oninvalid="this.setCustomValidity('Bayarnya Belum :D')"
+						onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);"
+						/>
+						</td>
+				</tr>
+				<tr>
+					<td>Kembalian</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>
+						<input type="hidden" name="kembalian" id="kembalian">
+						<input type="text"  id="result" style="border: none; color: white; background-color: orangered; padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+						<!-- <input type="text" name="" id="result" class="form-control"> -->
+						<!-- <p>
+						<span class="bg-danger text-white p-3 p-md-3" id="result">
+						</span></p> -->
+				</tr>
+				<tr>
+					<td colspan="6" align="reight">
+
+						<button class="btn btn-danger btn-lg btn-block" type="submit" name="bayar" style="color: white;">Payment
+						</button>
+					</td>
+			</form>
+					
+					<!-- <div class="modal fade rounded" id="myModal" tabindex="-1" role="dialog"
+						aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog p-3 p-md-3">
+							<div class="modal-content bg-dark text-white p-3 p-md-3">
+							<h3 class="text-center text-white p-3 p-md-5">TRANSACTION</h3>
+								<div class="modal-header bg-dark text-white">
+								
+									<h2 class="modal-title text-white">TOTAL :
+										Rp. <?php echo number_format($total, 0, ',', '.'); ?></h2>
+								</div>
+
+								<div class="modal-body row">
+									<div class="col-sm-12 p-3 p-md-3"> -->
+										<!--<form method="POST" action="?hal=cetak">-->
+											<!-- <form method="POST" action="cetak.php">
+											<div class="form-group">
+												<label><h3 class="text-white"> PAYMENT</h3></label>
+
+											</div>
+
+
+											<div class="form-group"> -->
+												<!-- <input type="hidden" id="type1" name="grand_total"
+													onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);"
+													value="<?php echo number_format($total, 0, ',', '.'); ?>"/> -->
+
+												<!-- <input type="text" class="form-control input-lg" placeholder="input payment"
+													id="type2" name="cash"
+													onKeyUp="kalkulatorTambah(getElementById('type1').value,this.value);"
+													/> -->
+
+									<!-- 
+											</div>
+
+											<div class="form-group">
+
+												<label><h3 class="text-white">CHANGE</h3></label> -->
+												<!-- <input type="hidden" name="kembalian"
+													id="kembalian">
+												<h1>
+
+											<span class="bg-danger text-white p-3 p-md-3" id="result">
+											</span></h1> -->
+											<!-- </div>
+
+											<div class="pull-right">
+
+												<button class="btn btn-info btn-sm"
+														type="submit">SAVE / PRINT
+												</button>
+												<button class="btn btn-danger btn-sm"
+														data-dismiss="modal" aria-hidden="true"
+														type="button">
+													Cancel
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					<!-- end modal -->
+				</tr>
+				</tbody>
+			</table>
+			</div>
+		</div> 
+    </div>
+  </div>
+</div>
+	
+
+
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script>
+// AJAX call for autocomplete 
+$(document).ready(function(){
+	$("#cari").change(function(){
+		$.ajax({
+		type: "POST",
+		url: "fungsi/edit/edit.php?cari_barang=yes",
+		data:'keyword='+$(this).val(),
+		beforeSend: function(){
+            $("#hasil_cari").hide();
+			$("#tunggu").html('<p style="color:green"><blink>tunggu sebentar</blink></p>');
+		},
+          success: function(html){
+			$("#tunggu").html('');
+            $("#hasil_cari").show();
+            $("#hasil_cari").html(html);
+		}
+	});
+	});
+});
+//To select country name
+</script>
+
+<script>
+	function diskon(){
+		var txtdisc = document.getElementById('txtdisc').value;
+		var disrp = document.getElementById('potongan').value;
+		var diskon = <?php echo $total ?> * txtdisc/100;
+		var totalakhir = <?php echo $total ?> - diskon - disrp;
+		if (!isNaN(totalakhir)) {
+			document.getElementById('type1').value = totalakhir;
+		}
+	}
+	
+	function bayar() {
+		var bayar = document.getElementById('txtbayar').value;
+		var akhir = document.getElementById('txttotakhir').value;
+		var kembali = bayar - akhir;
+		if (!isNaN(kembali)) {
+			document.getElementById('txtkembali').value = kembali;
+		}
+	}
+	function bayar() {
+		var bayar = document.getElementById('txtbayar').value;
+		var akhir = document.getElementById('txttotakhir').value;
+		var kembali = bayar - akhir;
+        // if (akhir == null || txtdisc == null || disrp == null) {
+        //     document.getElementById('txtkembali').value = '';
+        // }else
+		 if(!isNaN(kembali)){
+            document.getElementById('txtkembali').value = kembali;
+        }
+	}
+</script>
+<script>
+     $('#editable-sample').DataTable();
+</script>
+<script>
+    function searchFilter(page_num) {
+        // page_num = page_num?page_num:0;
+        var keywords = $('#keywords').val();
+        // var sortBy = $('#sortBy').val();
+        $.ajax({
+            type: 'GET',
+            url: 'getProduct.php',
+            data: '?hal=post&keywords=' + keywords,
+            beforeSend: function () {
+                $('.loading-overlay').show();
+            },
+            success: function (html) {
+                $('#show_product').html(html);
+                $('.loading-overlay').fadeOut("slow");
+            }
+        });
+    }
+
+    function formatRupiah(angka, prefix) {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+    }
+
+    function convertToRupiah(angka) {
+        var rupiah = '';
+        var angkarev = angka.toString().split('').reverse().join('');
+        for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + '.';
+        return 'Rp. ' + rupiah.split('', rupiah.length - 1).reverse().join('');
+    }
+
+    function kalkulatorTambah(type1, type2) {
+
+        var a = parseInt(type1.replace(/,.*|[^0-9]/g, ''), 10); //eval(type1);
+        var b = parseInt(type2.replace(/,.*|[^0-9]/g, ''), 10);
+        var hasil = b - a;
+
+        var jumlah = 'Rp. ' + hasil.toFixed(0).replace(/(d)(?=(ddd)+(?!d))/g, "$1.");
+        //var total = NilaiRupiah(hasil);
+        // console.info('hahah')
+        document.getElementById('result').value = convertToRupiah(hasil);
+
+        document.getElementById("kembalian").value = hasil; //document.getElementById("type2").value;
+
+    }
+
+    /* Tanpa Rupiah */
+    var tanpa_rupiah = document.getElementById('type1');
+    tanpa_rupiah.addEventListener('keyup', function (e) {
+        tanpa_rupiah.value = formatRupiah(this.value);
+    });
+
+    // var puser = document.getElementById('type2');
+    // puser.addEventListener('keyup', function (e) {
+    //     puser.value = formatRupiah(this.value);
+    // });
+
+</script>

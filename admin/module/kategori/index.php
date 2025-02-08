@@ -4,12 +4,14 @@
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
       <!--main content start-->
-      <section id="main-content">
-          <section class="wrapper">
+      <!-- <div class="container-fluid"> -->
+          <!-- <section class="wrapper"> -->
 
               <div class="row">
                   <div class="col-lg-12 main-chart">
-						<h3>Data Kategori</h3>
+					<div class="card">
+ 						<div class="card-body">
+						 <h3>Data Kategori</h3>
 						<br/>
 						<?php if(isset($_GET['success'])){?>
 						<div class="alert alert-success">
@@ -74,16 +76,18 @@
 									<td><?php echo $isi['nama_kategori'];?></td>
 									<td><?php echo $isi['tgl_input'];?></td>
 									<td>
-										<a href="index.php?page=kategori&uid=<?php echo $isi['id_kategori'];?>"><button class="btn btn-warning">Edit</button></a>
-										<a href="fungsi/hapus/hapus.php?kategori=hapus&id=<?php echo $isi['id_kategori'];?>" onclick="javascript:return confirm('Hapus Data Kategori ?');"><button class="btn btn-danger">Hapus</button></a>
+										<a href="index.php?page=kategori/edit&id=<?php echo $isi['id_kategori'];?>"><button class="btn btn-warning" title="Edit Kategori"><i class="mdi mdi-lead-pencil"></i></button></a>
+										<a href="fungsi/hapus/hapus.php?kategori=hapus&id=<?php echo $isi['id_kategori'];?>" onclick="javascript:return confirm('Hapus Data Kategori ?');"><button class="btn btn-danger" title="Hapus Kategori"><i style="color: white;" class="mdi mdi-delete"></i></button></a>
 									</td>
 								</tr>
 							<?php $no++; }?>
 							</tbody>
 						</table>
-						<div class="clearfix" style="padding-top:16%;"></div>
+						<div class="clearfix" style="padding-top:16%;"></div> 
+						</div>
+					</div>	
 				  </div>
               </div>
-          </section>
-      </section>
+          <!-- </section> -->
+      <!-- </div> -->
 	

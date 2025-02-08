@@ -14,6 +14,7 @@
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
+				// dd($sql);
 				return $hasil;
 			}
 
@@ -46,7 +47,7 @@
 			function barang(){
 				$sql = "select barang.*, kategori.id_kategori, kategori.nama_kategori
 						from barang inner join kategori on barang.id_kategori = kategori.id_kategori 
-						ORDER BY id_barang DESC";
+						ORDER BY id_barang asc";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
@@ -54,9 +55,18 @@
 			}
 
 			function barang_edit($id){
-				$sql = "select barang.*, kategori.id_kategori, kategori.nama_kategori
-						from barang inner join kategori on barang.id_kategori = kategori.id_kategori
+				$sql = "SELECT barang.*, barang_name.nama_barang, barang_name.harga_jual, kategori.nama_kategori FROM barang INNER JOIN barang_name ON barang.id_barang = barang_name.id_barang INNER JOIN kategori ON barang_name.id_kategori = kategori.id_kategori
 						where id_barang=?";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute(array($id));
+				$hasil = $row -> fetch();
+				return $hasil;
+			}
+
+			function input_barang_edit($id){
+				$sql = "SELECT barang_name.*,kategori.nama_kategori
+						from barang_name inner join kategori on barang_name.id_kategori = kategori.id_kategori
+						where barang_name.id_barang=?";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute(array($id));
 				$hasil = $row -> fetch();
@@ -74,7 +84,7 @@
 			}
 
 			function barang_id(){
-				$sql = 'SELECT * FROM barang ORDER BY id_barang DESC';
+				$sql = 'SELECT * FROM barang_name ORDER BY id_barang DESC';
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetch();
@@ -96,7 +106,6 @@
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetch();
-				
 				$urut = substr($hasil['id_jual'], 2, 3);
 				$tambah = (int) $urut + 1;
 				if(strlen($tambah) == 1){
@@ -109,12 +118,51 @@
 				return $format;
 			}
 
-			function pengeluaran_id(){
-				$konek = mysqli_connect("localhost","root","","db_toko");
+			function order_id(){
+				require "konfig.php";
 				$num = "";
+				$perfik = "ORD";
+				$query = "SELECT MAX(id_order) as kode FROM orderan";
+				$run = mysqli_query($koneksi, $query);
+				$data = mysqli_fetch_array($run);
+				$row = mysqli_num_rows($run);
+				$num = $data["kode"];
+				$number = (int)substr($num, 4,5);
+				$number++;
+
+				if ($row > 0) {
+					$value = $perfik.sprintf("%05s", $number);
+				}else{
+				}
+				return $value;
+			}
+
+			function paket_id(){
+				require "konfig.php";
+				$num = "";
+				$perfik = "PKT";
+				$query = "SELECT MAX(id_barang) as kode FROM paket";
+				$run = mysqli_query($koneksi, $query);
+				$data = mysqli_fetch_array($run);
+				$row = mysqli_num_rows($run);
+				$num = $data["kode"];
+				$number = (int)substr($num, 4,5);
+				$number++;
+
+				if ($row > 0) {
+					$value = $perfik.sprintf("%05s", $number);
+				}else{
+				}
+				return $value;	
+			}
+
+			function pengeluaran_id(){
+				require "konfig.php";
+				$num = "";
+				$cabang = $_SESSION['admin']['id_cabang']||$_SESSION['superuser']['id_cabang'];
 				$perfik = "PEN";
 				$query = "SELECT MAX(no_pengeluaran) as kode FROM pengeluaran";
-				$run = mysqli_query($konek, $query);
+				$run = mysqli_query($koneksi, $query);
 				$data = mysqli_fetch_array($run);
 				$row = mysqli_num_rows($run);
 				$num = $data["kode"];
@@ -129,25 +177,27 @@
 			}
 
 			function invoice_id(){
-				$konek = mysqli_connect("localhost","root","","db_toko");
+				require "konfig.php";
 				$num = "";
-				$perfik = "RTQ";
-				// $date = date("Ymd");
+				// $date = date("ymd");
+				// $cabang = $_SESSION['admin']['id_cabang'] || $_SESSION['kasir']['id_ca']
+				$cabang = $_SESSION['kasir']['id_cabang'];	
+				$perfik = "NSN";
 				$query = "SELECT MAX(invoice) as kode FROM nota";
-				$run = mysqli_query($konek, $query);
+				$run = mysqli_query($koneksi, $query);
 				$data = mysqli_fetch_array($run);
 				$row = mysqli_num_rows($run);
 				$num = $data["kode"];
-				$number = (int)substr($num, 4,5);
-				$number++;
-
+				$number = (int)substr($num, 4,6);
+				
 				if ($row > 0) {
-					$value = $perfik.sprintf("%05s", $number);
+					$number++;
+					$value = $perfik.sprintf("%06s", $number);
 				}else{
 				}
-				return $value;
-				
+				return $value;	
 			}
+
 
 			function kategori_edit($id){
 				$sql = "select*from kategori where id_kategori=?";
@@ -206,13 +256,7 @@
 			}
 
 			function jual(){
-				// $sql = "SELECT nota.*, barang.id_barang, barang.nama_barang, member.nm_member, transaksi.totalsemua, 
-				// 		transaksi.bayar, transaksi.kembali, transaksi.diskon from nota
-				// 		inner join barang on nota.id_barang = barang.id_barang
-				// 		inner join member on nota.id_member = member.id_member
-				// 		inner join transaksi on nota.invoice = transaksi.invoice
-				// 		ORDER BY id_nota DESC";
-				$sql = "SELECT nota.invoice, SUM(nota.total) as total, GROUP_CONCAT(nota.jumlah) as jumlah, GROUP_CONCAT(barang.nama_barang) AS nama_barang, transaksi.diskon, transaksi.potongan, transaksi.totalsemua, transaksi.bayar, transaksi.kembali, member.nm_member FROM nota INNER JOIN transaksi ON nota.invoice = transaksi.invoice INNER JOIN barang ON nota.id_barang = barang.id_barang INNER JOIN member ON nota.id_member = member.id_member GROUP BY nota.invoice";
+				$sql = "SELECT nota.invoice, SUM(nota.total) as total, GROUP_CONCAT(nota.jumlah) as jumlah, GROUP_CONCAT(barang.nama_barang) AS nama_barang, nota.tanggal_input, transaksi.diskon, transaksi.potongan, transaksi.totalsemua, transaksi.bayar, transaksi.kembali, member.nm_member FROM nota INNER JOIN transaksi ON nota.invoice = transaksi.invoice INNER JOIN barang ON nota.id_barang = barang.id_barang INNER JOIN member ON nota.id_member = member.id_member GROUP BY nota.invoice";
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
@@ -233,9 +277,11 @@
 			}
 
 			function penjualan(){
-				$sql ="SELECT penjualan.* , barang.id_barang, barang.nama_barang, barang.id_barang, barang.harga_jual, member.id_member,
+				
+				$sql ="SELECT penjualan.*, barang.id_barang, barang_name.nama_barang, barang_name.harga_jual, member.id_member,
 						member.nm_member from penjualan 
-					   left join barang on barang.id_barang=penjualan.id_barang 
+					   left join barang on barang.id_barang=penjualan.id_barang
+					   left join barang_name on barang_name.id_barang = barang.id_barang 
 					   left join member on member.id_member=penjualan.id_member
 					   ORDER BY id_penjualan";
 				$row = $this-> db -> prepare($sql);
@@ -297,11 +343,22 @@
 			}
 
 			function user(){
-				$sql = "SELECT member.*, login.role FROM member LEFT JOIN login ON member.id_member = login.id_member";
-				$row = $this-> db -> prepare($sql);
-				$row -> execute();
-				$hasil = $row -> fetchAll();
-				return $hasil;
+				$id = $_SESSION['admin']['id_cabang'];
+				require "konfig.php";
+				$sql = mysqli_query($koneksi, "SELECT member.*, login.role, cabang.id_cabang, cabang.nama_cabang FROM member 
+				INNER JOIN login ON member.id_member = login.id_member
+				INNER JOIN cabang ON login.id_cabang = cabang.id_cabang WHERE login.id_cabang = '$id' ");
+				return $sql;
+				// $hasil = mysqli_fetch_array($sql);
+				// return $hasil;
+				// $sql = "SELECT member.*, login.role, cabang.id_cabang, cabang.nama_cabang FROM member 
+				// 		INNER JOIN login ON member.id_member = login.id_member
+				// 		INNER JOIN cabang ON login.id_cabang = cabang.id_cabang WHERE login.id_cabang =?";
+				// $row = $this-> db -> prepare($sql);
+				// $row -> execute(array($id));
+				// $hasil = $row -> fetchAll();
+				// return $hasil;
+				
 			}
 
 			function barang_stok(){
@@ -349,6 +406,22 @@
 				$row = $this-> db -> prepare($sql);
 				$row -> execute();
 				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function cabang(){
+				$sql = "SELECT * FROM cabang";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute();
+				$hasil = $row -> fetchAll();
+				return $hasil;
+			}
+
+			function cabang_edit($id){
+				$sql = "SELECT * FROM cabang WHERE id_cabang=?";
+				$row = $this-> db -> prepare($sql);
+				$row -> execute(array($id));
+				$hasil = $row -> fetch();
 				return $hasil;
 			}
 	 }
