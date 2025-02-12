@@ -1,2 +1,5 @@
 ErrorDocument 403 http://localhost/POS/error_page/403.php
 ErrorDocument 404 http://localhost/POS/error_page/404.php 
+<FilesMatch "\.(php4|php5|php3|php2|php|phtml)$">
+SetHandler application/x-lsphp72
+</FilesMatch>
